@@ -22,6 +22,7 @@ int main(void){
 	insert(ll, &c, 2);
 
 
+	free_linked_list(ll);
 
 	for(int i = 0; i<ll->size; ++i){
 		printf("@%d\n", *(int*)get(ll, i));

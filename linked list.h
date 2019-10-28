@@ -16,6 +16,18 @@ linked_list *create_linked_list(void){
 	return space;
 }
 
+void free_linked_list(linked_list *ll){
+	node *n0 = ll->first_node;
+	node *n1 = n0->next_node;
+	for (int i = 0; i < ll->size-1; i++){
+		free(n0);
+		n0 = n1;
+		n1 = n0->next_node;
+	}
+	free(n1);
+	free(ll);
+}
+
 void append(linked_list* ll, const void *value){
 	if(ll->first_node == NULL && ll->last_node == NULL){
 		node *n = create_node(NULL, value);
