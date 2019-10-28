@@ -3,28 +3,28 @@
 #include "linked list.h"
 #include <stdbool.h>
 
-
-int f(int i){
-	return i+10;
-}
-
 int main(void){
 
 	linked_list *ll = create_linked_list();
 
-	append(ll, 0);
-	append(ll, 1);
-	append(ll, 3);
-	append(ll, 4);
+	int a, b, c, d, e;
+	a = 0;
+	b = 1;
+	c = 2;
+	d = 3;
+	e = 4;
 
-	insert(ll, 2, 2);
+	append(ll, &a);
+	append(ll, &b);
+	append(ll, &d);
+	append(ll, &e);
 
-	int (*func)(int) = &f;
+	insert(ll, &c, 2);
 
-	linked_list *new_ll = map(ll, func);
 
-	for(int i = 0; i<new_ll->size; ++i){
-		printf("@%d\n", get(new_ll, i));
+
+	for(int i = 0; i<ll->size; ++i){
+		printf("@%d\n", *(int*)get(ll, i));
 	}
 
 	return 0;

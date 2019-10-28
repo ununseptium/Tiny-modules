@@ -16,7 +16,7 @@ linked_list *create_linked_list(void){
 	return space;
 }
 
-void append(linked_list* ll, int value){
+void append(linked_list* ll, const void *value){
 	if(ll->first_node == NULL && ll->last_node == NULL){
 		node *n = create_node(NULL, value);
 		ll->first_node = n;
@@ -36,7 +36,7 @@ void append(linked_list* ll, int value){
 	}
 }
 
-void insert(linked_list* ll, int value, int index){
+void insert(linked_list* ll,const void *value, int index){
 	if(index == 0){
 		node *n = create_node(ll->first_node, value);
 		ll->first_node = n;
@@ -61,7 +61,7 @@ void insert(linked_list* ll, int value, int index){
 }
 
 
-int get(linked_list *ll, int index){
+void* get(linked_list *ll, int index){
 
 	if(index == 0){
 		return (*ll->first_node).value;
@@ -79,7 +79,7 @@ int get(linked_list *ll, int index){
 	return (*p_current_node).value;
 }
 
-void set(linked_list *ll, int index, int value){
+void set(linked_list *ll, int index, const void *value){
 	if(index == 0){
 		(*ll->first_node).value = value;
 	}
@@ -129,7 +129,7 @@ void removeAt(linked_list *ll, int index){
 	ll->size--;
 }
 
-linked_list *filter(linked_list *ll, bool (*lambda)(int)){
+linked_list *filter(linked_list *ll, bool (*lambda)(void*)){
 	linked_list *new_ll = create_linked_list();
 
 	for(int index_node = 0; index_node < ll->size; index_node++){
@@ -141,7 +141,7 @@ linked_list *filter(linked_list *ll, bool (*lambda)(int)){
 	return new_ll;
 }
 
-linked_list *map(linked_list *ll, int (*lambda)(int)){
+linked_list *map(linked_list *ll, int (*lambda)(void*)){
 	linked_list *new_ll = create_linked_list();
 
 	for(int index_node = 0; index_node < ll->size; index_node++){
