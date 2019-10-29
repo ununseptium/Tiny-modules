@@ -94,18 +94,19 @@ const void* get(linked_list *ll, int index){
 void set(linked_list *ll, int index, const void *value){
 	if(index == 0){
 		(*ll->first_node).value = value;
-	}
+	}else
 
-	if(index == (*ll->last_node).value){
+	if(index == ll->size-1){
 		(*ll->last_node).value = value;
-	}
+	}else{
 
-	node *p_current_node = ll->first_node;
-	for(int node_index = 0; node_index < index; node_index++){
-		p_current_node = (p_current_node->next_node);
-	}
+		node *p_current_node = ll->first_node;
+		for(int node_index = 0; node_index < index; node_index++){
+			p_current_node = (p_current_node->next_node);
+		}
 
-	(*p_current_node).value = value;
+		(*p_current_node).value = value;
+	}
 }
 
 
