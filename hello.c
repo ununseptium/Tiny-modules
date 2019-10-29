@@ -3,6 +3,13 @@
 #include "linked list.h"
 #include <stdbool.h>
 
+void* foo(const void *i){
+	int *a = malloc(sizeof(int));
+	*a = *(int*)i +100;
+	return a;
+	
+}
+
 int main(void){
 
 	linked_list *ll = create_linked_list();
@@ -20,13 +27,15 @@ int main(void){
 	append(ll, &e);
 
 	insert(ll, &c, 2);
+	
 
+	linked_list *new_ll = map(ll, foo);
 
-	free_linked_list(ll);
-
-	for(int i = 0; i<ll->size; ++i){
-		printf("@%d\n", *(int*)get(ll, i));
+	for(int i = 0; i<new_ll->size; ++i){
+		printf("@%d\n", *(int*)get(new_ll, i));
 	}
+	
+	free_linked_list(ll);
 
 	return 0;
 }

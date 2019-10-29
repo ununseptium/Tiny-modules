@@ -73,7 +73,7 @@ void insert(linked_list* ll,const void *value, int index){
 }
 
 
-void* get(linked_list *ll, int index){
+const void* get(linked_list *ll, int index){
 
 	if(index == 0){
 		return (*ll->first_node).value;
