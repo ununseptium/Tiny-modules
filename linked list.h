@@ -136,13 +136,11 @@ void removeAt(linked_list *ll, int index){
 
 		prenode->next_node = prenode->next_node->next_node;
 		free(prenode->next_node);
-
-
 	}
 	ll->size--;
 }
 
-linked_list *filter(linked_list *ll, bool (*lambda)(void*)){
+linked_list *filter(linked_list *ll, bool (*lambda)(const void*)){
 	linked_list *new_ll = create_linked_list();
 
 	for(int index_node = 0; index_node < ll->size; index_node++){
@@ -154,7 +152,7 @@ linked_list *filter(linked_list *ll, bool (*lambda)(void*)){
 	return new_ll;
 }
 
-linked_list *map(linked_list *ll, int (*lambda)(void*)){
+linked_list *map(linked_list *ll, void* (*lambda)(const void*)){
 	linked_list *new_ll = create_linked_list();
 
 	for(int index_node = 0; index_node < ll->size; index_node++){
