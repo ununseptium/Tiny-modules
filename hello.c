@@ -31,7 +31,7 @@ int main(void){
 	
 	
 	linked_list *new_ll = map(ll, foo, sizeof(int));
-	removeAt(new_ll, 0);
+	remove_at(new_ll, 0);
 	
 	for(int i = 0; i<new_ll->size; ++i){
 		printf("@%d\n", *(int*)get(new_ll, i));

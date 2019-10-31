@@ -93,15 +93,15 @@ const void* get(linked_list *ll, int index){
 	return (*p_current_node).value;
 }
 
-void removeAt(linked_list*, int);
+void remove_at(linked_list*, int);
 
 void set(linked_list *ll, int index, const void *value, size_t size){
-	removeAt(ll, index);
+	remove_at(ll, index);
 	insert(ll, index, value, size);
 }
 
 
-void removeAt(linked_list *ll, int index){
+void remove_at(linked_list *ll, int index){
 	if(index == 0){
 		node *n = ll->first_node->next_node;
 		free(ll->first_node->value);
