@@ -2,8 +2,8 @@
 #include <stdbool.h>
 
 typedef struct{
-	node *first_node;
-	node *last_node;
+	node_t *first_node;
+	node_t *last_node;
 	int size;
 } linked_list;
 
@@ -17,8 +17,8 @@ linked_list *create_linked_list(void){
 }
 
 void free_linked_list(linked_list *ll){
-	node *n0 = ll->first_node;
-	node *n1 = n0->next_node;
+	node_t *n0 = ll->first_node;
+	node_t *n1 = n0->next_node;
 	for (int i = 0; i < ll->size-1; i++){
 		free(n0->value);
 		free(n0);
@@ -32,18 +32,18 @@ void free_linked_list(linked_list *ll){
 
 void append(linked_list* ll, const void *value, size_t size){
 	if(ll->first_node == NULL && ll->last_node == NULL){
-		node *n = create_node(NULL, value, size);
+		node_t *n = create_node(NULL, value, size);
 		ll->first_node = n;
 		ll->size = 1;
 	}
 	else if(ll->last_node == NULL){
-		node *n = create_node(NULL, value, size);
+		node_t *n = create_node(NULL, value, size);
 		ll->first_node->next_node = n;
 		ll->last_node = n;
 		ll->size = 2;
 	}
 	else{
-		node *n = create_node(NULL, value, size);
+		node_t *n = create_node(NULL, value, size);
 		(*ll->last_node).next_node = n;
 		ll->last_node = n;
 		ll->size++;
@@ -52,7 +52,7 @@ void append(linked_list* ll, const void *value, size_t size){
 
 void insert(linked_list* ll, int index, const void *value, size_t size){
 	if(index == 0){
-		node *n = create_node(ll->first_node, value, size);
+		node_t *n = create_node(ll->first_node, value, size);
 		ll->first_node = n;
 		ll->size++;
 	}
@@ -60,14 +60,14 @@ void insert(linked_list* ll, int index, const void *value, size_t size){
 		append(ll, value, size);
 	}
 	else{
-		node *current_node = ll->first_node;
+		node_t *current_node = ll->first_node;
 		for(int index_node = 0; index_node < index - 1; index_node++){
 			current_node = current_node->next_node;
 		}
 
-		node *prenode = current_node;
-		node *postnode = current_node->next_node;
-		node *n = create_node(postnode, value, size);
+		node_t *prenode = current_node;
+		node_t *postnode = current_node->next_node;
+		node_t *n = create_node(postnode, value, size);
 
 		prenode->next_node = n;
 		ll->size++;
@@ -85,7 +85,7 @@ const void* get(linked_list *ll, int index){
 		return (*ll->last_node).value;
 	}
 
-	node *p_current_node = ll->first_node;
+	node_t *p_current_node = ll->first_node;
 	for(int node_index = 0; node_index < index; node_index++){
 		p_current_node = (p_current_node->next_node);
 	}
@@ -103,13 +103,13 @@ void set(linked_list *ll, int index, const void *value, size_t size){
 
 void remove_at(linked_list *ll, int index){
 	if(index == 0){
-		node *n = ll->first_node->next_node;
+		node_t *n = ll->first_node->next_node;
 		free(ll->first_node->value);
 		free(ll->first_node);
 		ll->first_node = n;
 	}
 	else if(index == ll->size-1){
-		node *n = ll->first_node;
+		node_t *n = ll->first_node;
 		free(ll->last_node->value);
 		free(ll->last_node);
 
@@ -122,12 +122,12 @@ void remove_at(linked_list *ll, int index){
 
 	}
 	else{
-		node *prenode = ll->first_node;
+		node_t *prenode = ll->first_node;
 		for(int node_index = 0; node_index<index-1; node_index++){
 			prenode = prenode->next_node;
 		}
 
-		node *n = prenode->next_node->next_node;
+		node_t *n = prenode->next_node->next_node;
 		free(prenode->next_node->value);
 		free(prenode->next_node);
 		prenode->next_node = n;

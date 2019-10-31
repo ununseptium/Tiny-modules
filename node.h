@@ -1,10 +1,10 @@
 typedef struct node{
 	struct node *next_node;
 	void *value;
-}node;
+}node_t;
 
-node *create_node(node *next_node,const void *value, size_t size){
-	node *n = malloc(sizeof(node));
+node_t *create_node(node_t *next_node,const void *value, size_t size){
+	node_t *n = malloc(sizeof(node_t));
 	n->next_node = next_node;
 	void *v = malloc(size);
 	
