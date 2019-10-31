@@ -20,10 +20,12 @@ void free_linked_list(linked_list *ll){
 	node *n0 = ll->first_node;
 	node *n1 = n0->next_node;
 	for (int i = 0; i < ll->size-1; i++){
+		free(n0->value);
 		free(n0);
 		n0 = n1;
 		n1 = n0->next_node;
 	}
+	free(n1->value);
 	free(n1);
 	free(ll);
 }
@@ -102,11 +104,13 @@ void set(linked_list *ll, int index, const void *value, size_t size){
 void removeAt(linked_list *ll, int index){
 	if(index == 0){
 		node *n = ll->first_node->next_node;
+		free(ll->first_node->value);
 		free(ll->first_node);
 		ll->first_node = n;
 	}
 	else if(index == ll->size-1){
 		node *n = ll->first_node;
+		free(ll->last_node->value);
 		free(ll->last_node);
 
 		for (int i = 0; i < index-1; i++) {
@@ -124,6 +128,7 @@ void removeAt(linked_list *ll, int index){
 		}
 
 		node *n = prenode->next_node->next_node;
+		free(prenode->next_node->value);
 		free(prenode->next_node);
 		prenode->next_node = n;
 	}
