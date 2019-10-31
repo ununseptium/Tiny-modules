@@ -21,21 +21,25 @@ int main(void){
 	d = 3;
 	e = 4;
 
-	append(ll, &a);
-	append(ll, &b);
-	append(ll, &d);
-	append(ll, &e);
+	append(ll, &a, sizeof(int));
+	append(ll, &b, sizeof(int));
+	append(ll, &d, sizeof(int));
+	append(ll, &e, sizeof(int));
 
-	insert(ll, &c, 2);
+	insert(ll, 2, &c, sizeof(int));
+	set(ll, 4, &a, sizeof(int));
 	
-
-	linked_list *new_ll = map(ll, foo);
-
+	
+	linked_list *new_ll = map(ll, foo, sizeof(int));
+	removeAt(new_ll, 0);
+	
 	for(int i = 0; i<new_ll->size; ++i){
 		printf("@%d\n", *(int*)get(new_ll, i));
 	}
 	
+	
 	free_linked_list(ll);
+	free_linked_list(new_ll);
 
 	return 0;
 }
