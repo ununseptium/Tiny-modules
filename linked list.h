@@ -123,8 +123,9 @@ void removeAt(linked_list *ll, int index){
 			prenode = prenode->next_node;
 		}
 
-		prenode->next_node = prenode->next_node->next_node;
+		node *n = prenode->next_node->next_node;
 		free(prenode->next_node);
+		prenode->next_node = n;
 	}
 	ll->size--;
 }
