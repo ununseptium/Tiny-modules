@@ -1,6 +1,6 @@
 typedef struct node{
 	struct node *next_node;
-	const void *value;
+	void *value;
 }node;
 
 node *create_node(node *next_node,const void *value, size_t size){
