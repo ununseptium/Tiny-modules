@@ -43,11 +43,6 @@ char *sha2(char *message) {
         m[messlen + 1 + zb + i] = (wmesslen >> ((7 - i) * 8)) & 0xff;
     }
 
-    for (int i = 0; i < 64; i++) {
-        printf("%x ", m[i]);
-    }
-    puts("\n");
-
     uint32_t hash_pieces[8] = {
             0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A, 0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19
     };
@@ -71,8 +66,6 @@ char *sha2(char *message) {
                     (m[piece + byte_in_piece + 1] << 8 * 2) |
                     (m[piece + byte_in_piece + 2] << 8) |
                     m[piece + byte_in_piece + 3];
-
-            printf("%x\n", w[byte_in_piece / 4]);
         }
 
 
