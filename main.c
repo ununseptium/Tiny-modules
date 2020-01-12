@@ -23,7 +23,7 @@ int zero_bytes(size_t strlen) {
 
 }
 
-char *sha256(char *message) {
+char *sha2(char *message) {
     uint64_t messlen = strlen(message);
     int zb = zero_bytes(messlen);
     uint64_t msize = messlen + 1 + 8 + zb;
@@ -137,7 +137,7 @@ char *sha256(char *message) {
 
 
 int main() {
-    unsigned char *hash = sha256("https://emn178.github.io/online-tools/sha256.html");
+    unsigned char *hash = sha2("https://emn178.github.io/online-tools/sha256.html");
 
     puts("\n");
     for (int i = 0; i < 32; i++) {
