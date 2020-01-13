@@ -8,9 +8,9 @@ uint32_t rotr(uint32_t uint32, uint32_t count) {
     uint32_t result = uint32;
     for (uint32_t i = 0; i < count; i++) {
         if (result % 2 == 0)
-            result = result >> 1;
+            result = result >> (uint32_t) 1;
         else
-            result = (result >> 1) | 0x80000000;
+            result = (result >> (uint32_t) 1) | 0x80000000;
     }
     return result;
 }
@@ -29,7 +29,7 @@ char *sha2(char *message) {
     uint64_t msize = messlen + 1 + 8 + zb;
 
     unsigned char m[msize];
-    strcpy(m, message);
+    strcpy((char *) m, message);
 
     m[messlen] = (char) 0x80;
 
@@ -40,7 +40,7 @@ char *sha2(char *message) {
     uint64_t wmesslen = messlen * 8;
 
     for (int i = 0; i < 8; i++) {
-        m[messlen + 1 + zb + i] = (wmesslen >> ((7 - i) * 8)) & 0xff;
+        m[messlen + 1 + zb + i] = (wmesslen >> ((7 - (uint32_t) i) * 8)) & (uint32_t) 0xff;
     }
 
     uint32_t hash_pieces[8] = {
@@ -62,16 +62,18 @@ char *sha2(char *message) {
         uint32_t w[64];
         for (int byte_in_piece = 0; byte_in_piece < 64; byte_in_piece += 4) {
             w[byte_in_piece / 4] =
-                    (m[piece + byte_in_piece] << 8 * 3) |
-                    (m[piece + byte_in_piece + 1] << 8 * 2) |
-                    (m[piece + byte_in_piece + 2] << 8) |
+                    (uint32_t) (m[piece + byte_in_piece] << (uint32_t) (8 * 3)) |
+                    (uint32_t) (m[piece + byte_in_piece + 1] << (uint32_t) (8 * 2)) |
+                    (uint32_t) (m[piece + byte_in_piece + 2] << (uint32_t) 8) |
                     m[piece + byte_in_piece + 3];
         }
 
 
         for (int i = 16; i < 64; i++) {
-            uint32_t s0 = rotr(w[i - 15], 7) ^rotr(w[i - 15], 18) ^(w[i - 15] >> 3);;
-            uint32_t s1 = rotr(w[i - 2], 17) ^rotr(w[i - 2], 19) ^(w[i - 2] >> 10);
+            uint32_t s0 = rotr(w[i - 15], 7) ^rotr(w[i - 15], 18) ^
+                          (w[i - 15] >> (uint32_t) 3);
+            uint32_t s1 = rotr(w[i - 2], 17) ^rotr(w[i - 2], 19) ^
+                          (w[i - 2] >> (uint32_t) 10);
             w[i] = w[i - 16] + s0 + w[i - 7] + s1;
         }
 
@@ -119,10 +121,10 @@ char *sha2(char *message) {
 
     char *hash = malloc(32 * sizeof(char));
     for (int i = 0; i < 32; i += 4) {
-        hash[i] = (hash_pieces[i / 4] >> (8 * 3));
-        hash[i + 1] = (hash_pieces[i / 4] >> (8 * 2)) & 0xff;
-        hash[i + 2] = (hash_pieces[i / 4] >> 8) & 0xff;
-        hash[i + 3] = hash_pieces[i / 4] & 0xff;
+        hash[i] = (char) (hash_pieces[i / 4] >> (uint32_t) (8 * 3));
+        hash[i + 1] = (char) ((hash_pieces[i / 4] >> (uint32_t) (8 * 2)) & (uint32_t) 0xff);
+        hash[i + 2] = (char) ((hash_pieces[i / 4] >> (uint32_t) 8) & (uint32_t) 0xff);
+        hash[i + 3] = (char) (hash_pieces[i / 4] & (uint32_t) 0xff);
     }
 
     return hash;
@@ -130,7 +132,7 @@ char *sha2(char *message) {
 
 
 int main() {
-    unsigned char *hash = sha2("https://emn178.github.io/online-tools/sha256.html");
+    unsigned char *hash = (uint8_t*)sha2("https://emn178.github.io/online-tools/sha256.html");
 
     puts("\n");
     for (int i = 0; i < 32; i++) {
