@@ -72,31 +72,9 @@ uint32_t crc32_lazy_execute(interim_crc_t *interim_crc, crc32_config crc32_conf)
 }
 
 uint32_t crc32(const uint8_t *data, size_t size, crc32_config crc32_conf) {
-    uint8_t *pinit = (uint8_t *) &crc32_conf.init;
-    uint32_t crc_value = 0;
-    for (size_t byte_index = 0; byte_index < size + uint32_s; byte_index++) {
-
-        uint8_t dbyte = 0;
-        if (byte_index < size) {
-            dbyte = data[byte_index];
-            if (crc32_conf.refin != 0) bit_reverse_order(&dbyte, uint8_s);
-        }
-
-        if (byte_index < uint32_s) dbyte = dbyte ^ pinit[byte_index];
-
-        for (uint8_t counter = 0; counter < BIT_IN_BYTE; counter++) {
-            if (crc_value & 0x80000000) crc_value = ((crc_value << 1) | ((dbyte >> 7) & 1)) ^ crc32_conf.poly;
-            else crc_value = (crc_value << 1) | ((dbyte >> 7) & 1);
-            dbyte = dbyte << 1;
-        }
-    }
-
-    if (crc32_conf.refout) bit_reverse_order(&crc_value, uint32_s);
-    crc_value = crc_value ^ crc32_conf.xorout;
-
-    return crc_value;
+	interim_crc_t *crc_val = crc32_lazy(NULL, (uint8_t *)data, size, crc32_conf);
+	return crc32_lazy_execute(crc_val, crc32_conf);
 }
-
 
 static void crc32_cache(crc32_config config, char *cache_file_name) {
     errno = 0;
