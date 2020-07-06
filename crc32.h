@@ -7,6 +7,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <stdint-gcc.h>
 #include <limits.h>
@@ -31,10 +32,18 @@ typedef struct {
     uint8_t refout;
 } crc32_config;
 
+typedef struct {
+	uint32_t temp_crc32;
+	size_t whole_data_size;
+} interim_crc_t;
 
 static void swap(void *a, void *b, size_t size);
 
 static void bit_reverse_order(void *arr, size_t size);
+
+interim_crc_t* crc32_lazy(interim_crc_t *interim_crc, uint8_t *data, size_t size, crc32_config crc32_conf);
+
+uint32_t crc32_lazy_execute(interim_crc_t *interim_crc, crc32_config crc32_conf);
 
 uint32_t crc32(const uint8_t *data, size_t size, crc32_config crc32_conf);
 
