@@ -31,7 +31,7 @@ static void bit_reverse_order(void *arr, size_t size) {
     }
 }
 
-interim_crc_t* crc32_lazy(interim_crc_t *interim_crc, uint8_t *data, size_t size, crc32_config crc32_conf){
+interim_crc_t* crc32_lazy(interim_crc_t *interim_crc, const uint8_t *data, size_t size, crc32_config crc32_conf){
 	if (interim_crc == NULL){
 		interim_crc = malloc(sizeof(interim_crc_t));
 		interim_crc->temp_crc32 = 0;
@@ -72,7 +72,7 @@ uint32_t crc32_lazy_execute(interim_crc_t *interim_crc, crc32_config crc32_conf)
 }
 
 uint32_t crc32(const uint8_t *data, size_t size, crc32_config crc32_conf) {
-	interim_crc_t *crc_val = crc32_lazy(NULL, (uint8_t *)data, size, crc32_conf);
+	interim_crc_t *crc_val = crc32_lazy(NULL, data, size, crc32_conf);
 	return crc32_lazy_execute(crc_val, crc32_conf);
 }
 
