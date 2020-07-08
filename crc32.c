@@ -105,30 +105,6 @@ static CRC32_CACHE crc32_cache(crc32_config config) {
 	return cache;
 }
 
-void crc32_load_cache(crc32_config conf, char *file_name, CRC32_CACHE cached_xors) {
-    errno = 0;
-    FILE *cache_file = fopen(file_name, "rb");
-    if (errno == ENOENT) {
-        errno = 0;
-        crc32_cache(conf, file_name);
-        if (errno != 0) return;
-    } else if (errno != 0) return;
-
-    cache_file = fopen(file_name, "rb");
-    if (errno != 0) return;
-
-    for (int counter = 0; counter < BYTE_VALUES_COUNT; counter++) {
-        fread(cached_xors + counter, uint32_s, 1, cache_file);
-        if (feof(cache_file)) {
-            fclose(cache_file);
-            errno = EIO;
-            return;
-        }
-    }
-
-    fclose(cache_file);
-}
-
 interim_crc_t* crc32_optimized_lazy(interim_crc_t *interim_crc, const uint8_t *data, size_t size, crc32_config crc32_conf, CRC32_CACHE *cache){
 	if (*cache == NULL){
 		*cache = crc32_cache(crc32_conf);

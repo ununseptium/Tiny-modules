@@ -49,8 +49,6 @@ uint32_t crc32(const uint8_t *data, size_t size, crc32_config crc32_conf);
 
 static CRC32_CACHE crc32_cache(crc32_config config);
 
-void crc32_load_cache(crc32_config conf, char *file_name, CRC32_CACHE cached_xors);
-
 interim_crc_t* crc32_optimized_lazy(interim_crc_t *interim_crc, const uint8_t *data, size_t size, crc32_config crc32_conf, CRC32_CACHE *cache);
 
 uint32_t crc32_optimized_lazy_execute(interim_crc_t *interim_crc, crc32_config crc32_conf, CRC32_CACHE *cache);
