@@ -76,19 +76,13 @@ uint32_t crc32(const uint8_t *data, size_t size, crc32_config crc32_conf) {
 	return crc32_lazy_execute(crc_val, crc32_conf);
 }
 
-static void crc32_cache(crc32_config config, char *cache_file_name) {
-    errno = 0;
-    FILE *file_cache = fopen(cache_file_name, "wb");
-    if (errno != 0) {
-        fclose(file_cache);
-        return;
-    }
-
+static CRC32_CACHE crc32_cache(crc32_config config) {
+	uint32_t *cache = malloc(256 * uint32_s);
     crc32_config cache_config = {config.poly, 0, 0, 0, 0};
 
     uint8_t byte = 0;
     if (config.refin != 0) {
-        for (int counter = 0; counter <= UCHAR_MAX; counter++, byte++) {
+        for (uint32_t counter = 0; counter <= UINT8_MAX; counter++, byte++) {
             uint8_t rbyte = byte;
             bit_reverse_order(&rbyte, uint8_s);
 
@@ -99,27 +93,16 @@ static void crc32_cache(crc32_config config, char *cache_file_name) {
                 bit_reverse_order(pcrc_value + offset, uint8_s);
             }
 
-            if (fwrite(&crc_value, uint32_s, 1, file_cache) != 1) {
-                fclose(file_cache);
-                remove(cache_file_name);
-                errno = EIO;
-                return;
-            }
+			cache[counter] = crc_value;
         }
     } else {
         for (int counter = 0; counter <= UCHAR_MAX; counter++, byte++) {
             uint32_t crc_value = crc32(&byte, uint8_s, cache_config);
-
-            if (fwrite(&crc_value, uint32_s, 1, file_cache) != 1) {
-                fclose(file_cache);
-                remove(cache_file_name);
-                errno = EIO;
-                return;
-            }
+			cache[counter] = crc_value;
         }
     }
 
-    fclose(file_cache);
+	return cache;
 }
 
 void crc32_load_cache(crc32_config conf, char *file_name, CRC32_CACHE cached_xors) {
@@ -144,6 +127,51 @@ void crc32_load_cache(crc32_config conf, char *file_name, CRC32_CACHE cached_xor
     }
 
     fclose(cache_file);
+}
+
+interim_crc_t* crc32_optimized_lazy(interim_crc_t *interim_crc, const uint8_t *data, size_t size, crc32_config crc32_conf, CRC32_CACHE *cache){
+	if (*cache == NULL){
+		*cache = crc32_cache(crc32_conf);
+	}
+	if (interim_crc == NULL){
+		interim_crc = malloc(sizeof(interim_crc_t));
+		interim_crc->temp_crc32 = 0;
+		interim_crc->whole_data_size = 0;
+	}
+
+	for (size_t byte_index = 0; byte_index < size; byte_index++){
+		uint8_t cur_byte = data[byte_index];
+		if (interim_crc->whole_data_size < uint32_s)
+			cur_byte ^= ((uint8_t*)(&crc32_conf.init))[byte_index];
+
+		uint8_t high_byte = interim_crc->temp_crc32 >> 24 & UINT8_MAX;
+		interim_crc->temp_crc32 = interim_crc->temp_crc32 << 8 | cur_byte;
+		interim_crc->temp_crc32 ^= ((uint32_t*)(*cache))[high_byte];
+
+		if (interim_crc->whole_data_size != SIZE_MAX)
+			(interim_crc->whole_data_size)++;
+	}
+
+	return interim_crc;
+}
+
+uint32_t crc32_optimized_lazy_execute(interim_crc_t *interim_crc, crc32_config crc32_conf, CRC32_CACHE *cache){
+	uint32_t zero_number = 0;
+	crc32_optimized_lazy(interim_crc, (uint8_t*)&zero_number, uint32_s, crc32_conf, cache);
+	
+	uint32_t crc_val = interim_crc->temp_crc32;
+	free(interim_crc);
+
+	if (crc32_conf.refin != 0)
+		for (uint32_t index = 0; index < uint32_s; index++)
+			bit_reverse_order((uint8_t*)(&crc_val) + index, uint8_s);
+
+	crc_val ^= crc32_conf.xorout;
+
+	if (crc32_conf.refout != 0) bit_reverse_order(&crc_val, uint32_s);
+
+	return crc_val;
+
 }
 
 uint32_t crc32_optimized(const uint8_t *data, size_t size, crc32_config conf, CRC32_CACHE cache) {
