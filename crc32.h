@@ -55,7 +55,7 @@ interim_crc_t* crc32_optimized_lazy(interim_crc_t *interim_crc, const uint8_t *d
 
 uint32_t crc32_optimized_lazy_execute(interim_crc_t *interim_crc, crc32_config crc32_conf, CRC32_CACHE *cache);
 
-uint32_t crc32_optimized(const uint8_t *data, size_t size, crc32_config conf, CRC32_CACHE cache);
+uint32_t crc32_optimized(const uint8_t *data, size_t size, crc32_config conf);
 
 
 

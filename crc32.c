@@ -174,28 +174,8 @@ uint32_t crc32_optimized_lazy_execute(interim_crc_t *interim_crc, crc32_config c
 
 }
 
-uint32_t crc32_optimized(const uint8_t *data, size_t size, crc32_config conf, CRC32_CACHE cache) {
-    uint8_t *pinit = (uint8_t *) &conf.init;
-    uint32_t crc_value = 0;
-    for (size_t byte_index = 0; byte_index < size + uint32_s; byte_index++) {
-        uint8_t curbyte = 0;
-        if (byte_index < size) curbyte = data[byte_index];
-        if (byte_index < uint32_s) curbyte = curbyte ^ pinit[byte_index];
-
-        uint8_t highbyte = crc_value >> (uint8_s * BIT_IN_BYTE * 3) & UCHAR_MAX;
-        crc_value = (crc_value << (uint8_s * BIT_IN_BYTE)) | curbyte;
-        crc_value = crc_value ^ cache[highbyte];
-    }
-
-    uint8_t *pcrc_value = (uint8_t *) (&crc_value);
-
-    if (conf.refin != 0)
-        for (int offset = 0; offset < uint32_s; offset++) {
-            bit_reverse_order(pcrc_value + offset, uint8_s);
-        }
-
-    crc_value = crc_value ^ conf.xorout;
-    if (conf.refout != 0) bit_reverse_order(pcrc_value, uint32_s);
-
-    return crc_value;
+uint32_t crc32_optimized(const uint8_t *data, size_t size, crc32_config conf) {
+	CRC32_CACHE cache = NULL;
+	interim_crc_t *crc_val = crc32_optimized_lazy(NULL, data, size, conf, &cache);
+	return crc32_optimized_lazy_execute(crc_val, conf, &cache);
 }
