@@ -1,2 +1,6 @@
 *.exe
 *.bin
+.vim/
+tmp/
+local_vimrc
+vim_startup.bat

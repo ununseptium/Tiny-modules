@@ -1,12 +1,12 @@
-
-#ifndef CRC32_H
-#define CRC32_H
+#ifndef _CRC32_H
+#define _CRC32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <stdint-gcc.h>
 #include <limits.h>
@@ -20,7 +20,7 @@ extern "C" {
 #define BIT_IN_BYTE 8
 #endif
 
-typedef uint32_t CRC32_CACHE[BYTE_VALUES_COUNT];
+typedef void* CRC32_CACHE;
 
 
 typedef struct {
@@ -31,18 +31,28 @@ typedef struct {
     uint8_t refout;
 } crc32_config;
 
+typedef struct {
+	uint32_t temp_crc32;
+	size_t whole_data_size;
+} interim_crc_t;
 
 static void swap(void *a, void *b, size_t size);
 
 static void bit_reverse_order(void *arr, size_t size);
 
+interim_crc_t* crc32_lazy(interim_crc_t *interim_crc, const uint8_t *data, size_t size, crc32_config crc32_conf);
+
+uint32_t crc32_lazy_execute(interim_crc_t *interim_crc, crc32_config crc32_conf);
+
 uint32_t crc32(const uint8_t *data, size_t size, crc32_config crc32_conf);
 
-static void crc32_cache(crc32_config config, char *cache_file_name);
+static CRC32_CACHE crc32_cache(crc32_config config);
 
-void crc32_load_cache(crc32_config conf, char *file_name, CRC32_CACHE cached_xors);
+interim_crc_t* crc32_optimized_lazy(interim_crc_t *interim_crc, const uint8_t *data, size_t size, crc32_config crc32_conf, CRC32_CACHE *cache);
 
-uint32_t crc32_optimized(const uint8_t *data, size_t size, crc32_config conf, CRC32_CACHE cache);
+uint32_t crc32_optimized_lazy_execute(interim_crc_t *interim_crc, crc32_config crc32_conf, CRC32_CACHE *cache);
+
+uint32_t crc32_optimized(const uint8_t *data, size_t size, crc32_config conf);
 
 
 
@@ -50,4 +60,4 @@ uint32_t crc32_optimized(const uint8_t *data, size_t size, crc32_config conf, CR
 }
 #endif
 
-#endif /* CRC32_H */
+#endif /* _CRC32_H */
