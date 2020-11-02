@@ -599,13 +599,15 @@ static char* zip_sys_cut_to_relative_filename(const char *abs_filename, const ch
 } 
 
 uint32_t zip_sys_create_dir(const char *dirname){
-	if (dirname == NULL || zip_sys_is_file_exist(dirname)) return 1;
+	if (dirname == NULL) return UINT32_MAX;
 
 	#ifdef __WIN32__
-		if (CreateDirectoryA(dirname, NULL) == 0) return 1;
+		uint32_t create_directory_res = CreateDirectoryA(dirname, NULL);
+		if (GetLastError() == ERROR_ALREADY_EXISTS) return 1;
+		if (CreateDirectoryA(dirname, NULL) != 0) return 0;
 	#endif
 	
-	return 0;
+	return UINT32_MAX;
 }
 
 FILEOS* zip_sys_fopen(const char *filename, const char *mode){
