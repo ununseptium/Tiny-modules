@@ -27,10 +27,11 @@ uint32_t zip_sys_is_file_exist(const char *filename){
 uint32_t zip_sys_is_folder(const char *filename){
 	#ifdef __WIN32__
 		DWORD attrs = GetFileAttributesA(filename);
-		if (attrs == INVALID_FILE_ATTRIBUTES || !(attrs & FILE_ATTRIBUTE_DIRECTORY)) return 0;
+		if (attrs == INVALID_FILE_ATTRIBUTES) return UINT32_MAX;
+		return (attrs & FILE_ATTRIBUTE_DIRECTORY);
 	#endif
 
-	return 1;
+	return UINT32_MAX;
 }
 
 void* zip_sys_collect_pathtree_info(const char* path){
