@@ -81,14 +81,11 @@ uint32_t zip_sys_process_next_file(void *pathtree_info, fileinfo_t fi){
 }
 
 uint32_t zip_sys_close_process(void *pathtree_info, fileinfo_t fi){
-	if (pathtree_info != NULL){
-		zip_sys_fclose((FILE*)pathtree_info);
-		remove("tmp/pathtree.tmp");
-	}
+	if (pathtree_info == NULL || fi == NULL) return 1;
 
-	if (fi != NULL){
-		zip_sys_free_filedata(fi);
-	}
+	if (zip_sys_fclose((FILE*)pathtree_info) == EOF) return 1;
+	if (remove("tmp/pathtree.tmp") != 0) return 1;
+	if (zip_sys_free_filedata(fi) != 0) return 1;
 
 	return 0;
 }
