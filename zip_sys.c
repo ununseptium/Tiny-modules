@@ -955,7 +955,7 @@ void* zip_sys_map_view(void *mmf, uint32_t access_mode, uintmax_t offset, uintma
 }
 
 uint32_t zip_sys_unmap_view(void *map_view, uintmax_t view_size){
-	if (map_view == NULL) return 0;
+	if (map_view == NULL) return 1;
 
 	#ifdef __WIN32__
 		return !UnmapViewOfFile(map_view);
