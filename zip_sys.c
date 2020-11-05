@@ -438,6 +438,11 @@ uint32_t zip_sys_process_zip64(
 ){
 	if (extra_data_size == 0) return 1;
 	if (extra_data == NULL) return 1;
+	if (
+			zip64_field.uncompressedSize == NULL &&
+			zip64_field.compressedSize == NULL &&
+			zip64_field.correspondingHeaderOffset == NULL
+	) return 1;
 
 	uint16_t tag;
 	uint16_t block_size;
