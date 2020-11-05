@@ -493,7 +493,7 @@ uint32_t zip_sys_process_zip64(
 	return 0;
 }
 
-uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack){
+static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack){
 	#ifdef __WIN32__
 		access(pathtree_file != NULL && cur_filename != NULL && path_to_pack != NULL);
 
