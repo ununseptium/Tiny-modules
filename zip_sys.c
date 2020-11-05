@@ -485,7 +485,7 @@ uint32_t zip_sys_process_zip64(
 		next_zip64_field += sizeof(*(zip64_field.correspondingHeaderOffset));
 	}
 
-	return sizeof(tag) + sizeof(zip64_block_size) + zip64_block_size;
+	return 0;
 }
 
 uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack){
