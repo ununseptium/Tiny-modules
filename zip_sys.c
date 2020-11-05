@@ -576,7 +576,7 @@ static void zip_sys_free_filedata_fields(filedata_t *fd){
 		free(fd->os_data);
 }
 
-static uint32_t zip_sys_free_filedata(filedata_t *fd){
+static void zip_sys_free_filedata(filedata_t *fd){
 	if (fd != NULL){
 		zip_sys_free_filedata_fields(fd);
 		free(fd);
