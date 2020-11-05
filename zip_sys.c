@@ -694,7 +694,10 @@ uint32_t zip_sys_create_dir(const char *dirname){
 
 	#ifdef __WIN32__
 		uint32_t create_directory_res = CreateDirectoryA(dirname, NULL);
-		if (GetLastError() == ERROR_ALREADY_EXISTS) return 1;
+		if (GetLastError() == ERROR_ALREADY_EXISTS){
+			SetLastError(ERROR_SUCCESS);
+			return 1;
+		}
 		if (CreateDirectoryA(dirname, NULL) != 0) return 0;
 	#endif
 	
