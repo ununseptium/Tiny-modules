@@ -60,7 +60,7 @@ void* zip_sys_collect_pathtree_info(const char* path){
 		return pathtree_info_file
 	#endif 
 
-	return pathtree_info_file;
+	return NULL;
 }
 
 fileinfo_t zip_sys_process_first_file(void *pathtree_info){
