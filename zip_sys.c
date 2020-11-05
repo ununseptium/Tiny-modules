@@ -11,6 +11,8 @@ static uint16_t zip_sys_get_machine_os_version(){
 }
 
 uint32_t zip_sys_is_file_exist(const char *filename){
+	if (filename == NULL) return UINT32_MAX;
+
 	#ifdef __WIN32__
 		WIN32_FIND_DATA data;
 		HANDLE h = FindFirstFileA(filename, &data);
@@ -25,6 +27,8 @@ uint32_t zip_sys_is_file_exist(const char *filename){
 }
 
 uint32_t zip_sys_is_folder(const char *filename){
+	if (filename == NULL) return UINT32_MAX;
+
 	#ifdef __WIN32__
 		DWORD attrs = GetFileAttributesA(filename);
 		if (attrs == INVALID_FILE_ATTRIBUTES) return UINT32_MAX;
@@ -35,6 +39,8 @@ uint32_t zip_sys_is_folder(const char *filename){
 }
 
 void* zip_sys_collect_pathtree_info(const char* path){
+	if (path == NULL) return NULL;
+
 	if(!zip_sys_is_file_exist(path)){
 		return NULL;
 	}
@@ -152,6 +158,8 @@ const char* zip_sys_get_relative_filename(fileinfo_t fi){
 }
 
 void* zip_sys_get_extra_data_lfh(uint16_t* extra_data_lfh_size, fileinfo_t fi, uint64_amd64_t uncompressed_size, uint64_amd64_t compressed_size){
+	if (extra_data_lfh_size == NULL) return NULL;
+
 	uint16_t zip64_block_max_size = 32;
 
 	uint8_t *extra_data_lfh = malloc(zip64_block_max_size);
@@ -175,6 +183,8 @@ void* zip_sys_get_extra_data_cfh(
 		uint16_t* extra_data_cfh_size, fileinfo_t fi, uint64_amd64_t lfh_offset,
 		struct LocalFileHeader lfh, void *extra_data_lfh
 ){
+	if (extra_data_cfh_size == NULL) return NULL;
+
 	uint16_t zip64_block_max_size = 32;
 
 	uint16_t os_block_size = 0;
@@ -218,6 +228,8 @@ void* zip_sys_get_extra_data_cfh(
 static uint16_t zip_sys_get_zip64_extra_block(
 		uint8_t *zip64_extra_block, struct Zip64ExtraField zip64_field
 ){
+	assert(zip64_extra_block != NULL);
+
 	uint16_t zip64_tag = 1;
 	zip_bo_le_uint16(&zip64_tag);
 	memcpy(zip64_extra_block, &zip64_tag, sizeof(zip64_tag));
@@ -283,6 +295,8 @@ static uint16_t zip_sys_get_zip64_extra_block(
 
 static uint16_t zip_sys_get_ntfs_extra_block(uint8_t *ntfs_extra_block, fileinfo_t fi){
 	#ifdef __WIN32__
+		access(fi != NULL);
+		if (fi->os_data == NULL) return 0;
 
 		uint16_t ntfs_tag = 0xa;
 		zip_bo_le_uint16(&ntfs_tag);
@@ -331,6 +345,8 @@ static uint16_t zip_sys_get_ntfs_extra_block(uint8_t *ntfs_extra_block, fileinfo
 }
 
 void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uint64_amd64_t cdfh_offset, uint64_amd64_t cdfh_total, uint64_amd64_t cdfh_size){
+	if (pre_extra_data_eocd_size == NULL) return NULL;
+
 	if (
 			uint64_amd64_lt_uint32(cdfh_offset, UINT32_MAX) &&
 			uint64_amd64_lt_uint32(cdfh_total, (uint32_t)UINT16_MAX) &&
@@ -397,6 +413,7 @@ uint32_t zip_sys_process_zip64(
 		const uint8_t *extra_data, uint16_t extra_data_size, struct Zip64ExtraField zip64_field
 ){
 	if (extra_data_size == 0) return 1;
+	if (extra_data == NULL) return 1;
 
 	uint16_t tag;
 	uint16_t block_size;
@@ -450,6 +467,7 @@ uint32_t zip_sys_process_zip64(
 uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack){
 	#ifdef __WIN32__
 		assert(zip_sys_is_file_exist(cur_filename));
+		access(pathtree_file != NULL && cur_filename != NULL && path_to_pack != NULL);
 		assert(strlen(cur_filename) < MAX_PATH);
 
 		WIN32_FIND_DATA cur_filedata;
@@ -523,6 +541,8 @@ static uint32_t zip_sys_write_filedata(FILEOS *file, filedata_t *fd, uint32_t os
 }
 
 static uint32_t zip_sys_read_filedata(FILEOS *file, filedata_t *fd, uint32_t os_data_size){
+	access(file != NULL && fd != NULL);
+
 	if (zip_sys_fread(&(fd->os_ver), sizeof(uint16_t), 1, file) != 1) return 1;
 	if (zip_sys_fread(&(fd->modification_time), sizeof(uint16_t), 1, file) != 1) return 1;
 	if (zip_sys_fread(&(fd->modification_date), sizeof(uint16_t), 1, file) != 1) return 1;
@@ -612,6 +632,8 @@ uint32_t zip_sys_create_dir(const char *dirname){
 }
 
 FILEOS* zip_sys_fopen(const char *filename, const char *mode){
+	if (filename == NULL || mode == NULL) return NULL;
+
 	uint32_t dir_len = strlen(filename);
 
 	while(dir_len > 0){
@@ -778,7 +800,7 @@ uint32_t zip_sys_fseek(FILEOS *stream, intmax_t offset, uint32_t whence){
 }
 
 uint32_t zip_sys_get_file_size(FILEOS *stream, uintmax_t *size){
-	if (stream == NULL) return 0;
+	if (stream == NULL || size == NULL) return 1;
 
 	#ifdef __WIN32__
 		uint32_t size_high_half;
@@ -882,6 +904,8 @@ uint32_t zip_sys_f2f_data_transfer(
 		FILEOS *stream_in, uintmax_t offset_in,
 		uintmax_t data_size, uint32_t *crc32
 ){
+	if (stream_out == NULL || stream_in == NULL) return 1;
+
 	void *mm_file_out = zip_sys_create_mmf(stream_out, offset_out + data_size, ZIP_MMF_READ_WRITE);
 	if (mm_file_out == NULL){
 		return 1;
