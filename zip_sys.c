@@ -159,9 +159,7 @@ const char* zip_sys_get_absolute_filename(fileinfo_t fi){
 }
 
 const char* zip_sys_get_relative_filename(fileinfo_t fi){
-	if (fi == NULL){
-		return 0;	
-	}
+	if (fi == NULL) return NULL;	
 
 	return ((filedata_t*)fi)->relative_filename;
 }
