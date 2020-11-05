@@ -106,7 +106,8 @@ uint32_t zip_sys_close_process(void *pathtree_info, fileinfo_t fi){
 
 	if (zip_sys_fclose((FILE*)pathtree_info) == EOF) return 1;
 	if (remove("tmp/pathtree.tmp") != 0) return 1;
-	if (zip_sys_free_filedata(fi) != 0) return 1;
+
+	zip_sys_free_filedata(fi);
 
 	return 0;
 }
