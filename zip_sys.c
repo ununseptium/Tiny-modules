@@ -16,7 +16,10 @@ uint32_t zip_sys_is_file_exist(const char *filename){
 	#ifdef __WIN32__
 		WIN32_FIND_DATA data;
 		HANDLE h = FindFirstFileA(filename, &data);
-		if (GetLastError() == ERROR_FILE_NOT_FOUND) return 0;
+		if (GetLastError() == ERROR_FILE_NOT_FOUND){
+			SetLastError(ERROR_SUCCESS);
+			return 0;
+		}
 		if (h == INVALID_HANDLE_VALUE) return UINT32_MAX;
 
 		FindClose(h);
