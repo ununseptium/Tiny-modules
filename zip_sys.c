@@ -965,7 +965,7 @@ uint32_t zip_sys_unmap_view(void *map_view, uintmax_t view_size){
 }
 
 uint32_t zip_sys_close_mmf(void *mmf){
-	if (mmf == NULL) return 0;
+	if (mmf == NULL) return 1;
 
 	#ifdef __WIN32__
 		return !CloseHandle(mmf);
