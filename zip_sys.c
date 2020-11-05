@@ -447,19 +447,19 @@ uint32_t zip_sys_process_zip64(
 	return sizeof(tag) + sizeof(zip64_block_size) + zip64_block_size;
 }
 
-void zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack){
+uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack){
 	#ifdef __WIN32__
 		assert(zip_sys_is_file_exist(cur_filename));
 		assert(strlen(cur_filename) < MAX_PATH);
 
 		WIN32_FIND_DATA cur_filedata;
 		HANDLE handle = FindFirstFileA(cur_filename, &cur_filedata);
-		if (handle == INVALID_HANDLE_VALUE) abort();
+		if (handle == INVALID_HANDLE_VALUE) return 1;
 		FindClose(handle);
 
 		filedata_t *fd = malloc(sizeof(filedata_t));
 		if(fd == NULL){
-			abort();
+			return 1;
 		}
 		fd->os_ver = WINDOWS_OS_VER;
 		
@@ -467,7 +467,7 @@ void zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const c
 				&(cur_filedata.ftLastWriteTime), 
 				(WORD*)&(fd->modification_date), (WORD*)&(fd->modification_time)
 		)){
-			abort();
+			return 1;
 		}
 
 		fd->internal_attrs = 0;
@@ -492,7 +492,7 @@ void zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const c
 
 		WIN32_FIND_DATAA subfile_data;
 		HANDLE pathtree_pos = FindFirstFileA(search_pattern, &subfile_data);
-		if (pathtree_pos == INVALID_HANDLE_VALUE) return;
+		if (pathtree_pos == INVALID_HANDLE_VALUE) return 0;
 
 		char subfile_name[MAX_PATH];
 		do{
