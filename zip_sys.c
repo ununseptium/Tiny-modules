@@ -578,8 +578,10 @@ static uint32_t zip_sys_free_filedata_fields(filedata_t *fd){
 }
 
 static uint32_t zip_sys_free_filedata(filedata_t *fd){
-	zip_sys_free_filedata_fields(fd);
-	free(fd);
+	if (fd != NULL){
+		zip_sys_free_filedata_fields(fd);
+		free(fd);
+	}
 }
 
 static char* zip_sys_cut_to_relative_filename(const char *abs_filename, const char *root){
