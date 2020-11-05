@@ -584,7 +584,9 @@ static uint32_t zip_sys_free_filedata(filedata_t *fd){
 	}
 }
 
-static char* zip_sys_cut_to_relative_filename(const char *abs_filename, const char *root){
+static char* zip_sys_cut_to_relative_filename(const char *abs_filename, const char *root, char *rel_filename){
+	access(abs_filename != NULL && root != NULL && rel_filename != NULL);
+	
 	uint32_t root_len = strlen(root);
 	uint32_t root_offset = root_len;
 
@@ -593,8 +595,7 @@ static char* zip_sys_cut_to_relative_filename(const char *abs_filename, const ch
 		root_offset--;
 	}
 
-	char *relative_filename = malloc((strlen(abs_filename) - root_offset + 1) * sizeof(char));
-	strcpy(relative_filename, abs_filename + root_offset);
+	strcpy(rel_filename, abs_filename + root_offset);
 
 	return relative_filename;
 } 
