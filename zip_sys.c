@@ -834,10 +834,8 @@ uint32_t zip_sys_fsetpos(FILEOS *stream, zip_fpos_t *pos){
 	if (stream == NULL || pos == NULL) return 1;
 
 	#ifdef __WIN32__
-		if (SetFilePointer(stream, pos->low_half, (LONG*)&(pos->high_half), FILE_BEGIN) != INVALID_SET_FILE_POINTER){
-			return 1;
-		}
-		return 0;
+		if (SetFilePointer(stream, pos->low_half, (LONG*)&(pos->high_half), FILE_BEGIN) != INVALID_SET_FILE_POINTER)
+			return 0;
 	#endif
 
 	return 1;
@@ -867,11 +865,8 @@ uint32_t zip_sys_fseek(FILEOS *stream, intmax_t offset, uint32_t whence){
 		if (sizeof(offset) == 8){
 			offset_high_half = (offset >> 32) & UINT32_MAX;
 		}
-		if (SetFilePointer((HANDLE)stream, offset_low_half, (LONG*)&offset_high_half, dwMoveMethod) == INVALID_SET_FILE_POINTER){
-			return 1;
-		}
-
-		return 0;
+		if (SetFilePointer((HANDLE)stream, offset_low_half, (LONG*)&offset_high_half, dwMoveMethod) != INVALID_SET_FILE_POINTER)
+			return 0;
 
 	#endif
 
