@@ -516,6 +516,7 @@ uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, con
 				&(cur_filedata.ftLastWriteTime), 
 				(WORD*)&(fd->modification_date), (WORD*)&(fd->modification_time)
 		)){
+			free(fd);
 			return 1;
 		}
 
