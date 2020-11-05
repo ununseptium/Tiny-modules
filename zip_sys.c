@@ -41,14 +41,20 @@ uint32_t zip_sys_is_folder(const char *filename){
 void* zip_sys_collect_pathtree_info(const char* path){
 	if (path == NULL) return NULL;
 
-	if(!zip_sys_is_file_exist(path)){
+	uint32_t file_exist = zip_sys_is_file_exist(path);
+	if(!file_exist || file_exist == UINT32_MAX){
 		return NULL;
 	}
 
 	FILEOS* pathtree_info_file = zip_sys_fopen("tmp/pathtree.tmp", "wb+");
+	if (pathtree_info_file == NULL) return NULL;
 
 	#ifdef __WIN32__
-		zip_sys_lookup_win(pathtree_info_file, path, path);
+		if(zip_sys_lookup_win(pathtree_info_file, path, path) != 0){
+			zip_sys_fclose(pathtree_info_file);
+			return NULL;
+		}
+		return pathtree_info_file
 	#endif 
 
 	return pathtree_info_file;
@@ -63,6 +69,7 @@ fileinfo_t zip_sys_process_first_file(void *pathtree_info){
 	uint64_amd64_t zero_offset = {0, 0};
 	zip_amd64_fseek(pathtree_info_file, zero_offset, SEEK_SET);
 	filedata_t *fd = malloc(sizeof(filedata_t));
+	if (fd == NULL) return NULL
 
 	#ifdef __WIN32__
 		if (zip_sys_read_filedata(pathtree_info_file, fd, WINDOWS_OS_DATA_SIZE)){
@@ -163,6 +170,10 @@ void* zip_sys_get_extra_data_lfh(uint16_t* extra_data_lfh_size, fileinfo_t fi, u
 	uint16_t zip64_block_max_size = 32;
 
 	uint8_t *extra_data_lfh = malloc(zip64_block_max_size);
+	if (extra_data_lfh == NULL){
+		*extra_data_lfh_size = 1;
+		return NULL;
+	}
 	*extra_data_lfh_size = 0;
 
 	struct Zip64ExtraField zip64_field;
@@ -193,6 +204,11 @@ void* zip_sys_get_extra_data_cfh(
 	#endif
 	
 	uint8_t *extra_data = malloc(zip64_block_max_size + os_block_size);
+	if (extra_data == NULL){
+		*extra_data_cfh_size = 1;
+		return NULL;
+	}
+
 	*extra_data_cfh_size = 0;
 
 	uint64_amd64_t uncompressed_size = {0, 0};
@@ -208,7 +224,11 @@ void* zip_sys_get_extra_data_cfh(
 	if (lfh.compressedSize == UINT32_MAX)
 		zip64_field.compressedSize = &compressed_size;
 
-	zip_sys_process_zip64(extra_data_lfh, lfh.extraFieldLength, zip64_field);
+	uint32_t res = zip_sys_process_zip64(extra_data_lfh, lfh.extraFieldLength, zip64_field);
+	if (res != 0){
+		free(extra_data);
+		return NULL;
+	}
 
 	zip64_field.correspondingHeaderOffset = &lfh_offset;
 	*extra_data_cfh_size += zip_sys_get_zip64_extra_block(extra_data + *extra_data_cfh_size, zip64_field);
@@ -364,6 +384,10 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uint64_amd64
 		zip64_data_sector_size;
 
 	uint8_t *pre_extra_data_eocd = malloc(*pre_extra_data_eocd_size);
+	if (pre_extra_data_eocd == NULL){
+		*pre_extra_data_eocd_size = 1;
+		return NULL
+	};
 	
 	struct Zip64EndOfCentralDirectory zip64_eocd;
 	zip64_eocd.signature = 0x06064b50;
@@ -466,8 +490,10 @@ uint32_t zip_sys_process_zip64(
 
 uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack){
 	#ifdef __WIN32__
-		assert(zip_sys_is_file_exist(cur_filename));
 		access(pathtree_file != NULL && cur_filename != NULL && path_to_pack != NULL);
+
+		uint32_t file_exist = zip_sys_is_file_exist(cur_filename);
+		assert(file_exist && file_exist != UINT32_MAX);
 		assert(strlen(cur_filename) < MAX_PATH);
 
 		WIN32_FIND_DATA cur_filedata;
@@ -491,17 +517,37 @@ uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, con
 		fd->internal_attrs = 0;
 		fd->external_attrs = cur_filedata.dwFileAttributes;
 
+		fd->relative_filename = malloc(strlen(cur_filename) + 1);
+		if (fd->relative_filename == NULL){
+			free(fd);
+			return 1
+		}
 		fd->relative_filename = zip_sys_cut_to_relative_filename(cur_filename, path_to_pack);
+
 		fd->absolute_filename = malloc(strlen(cur_filename) + 1);
+		if (fd->absolute_filename == NULL){
+			free(fd->relative_filename);
+			free(fd);
+			return 1;
+		}
 		strcpy(fd->absolute_filename, cur_filename);
 
 		fd->os_data = malloc(WINDOWS_OS_DATA_SIZE);
+		if (fd->os_data == NULL){
+			free(fd->relative_filename);
+			free(fd->absolute_filename);
+			free(fd);
+			return 1;
+		}
 		memcpy(fd->os_data, &(cur_filedata.ftLastWriteTime), sizeof(FILETIME));
 		memcpy(fd->os_data + sizeof(FILETIME), &(cur_filedata.ftLastAccessTime), sizeof(FILETIME));
 		memcpy(fd->os_data + sizeof(FILETIME) * 2, &(cur_filedata.ftCreationTime), sizeof(FILETIME));
 		
-		zip_sys_write_filedata(pathtree_file, fd, WINDOWS_OS_DATA_SIZE);
-		zip_sys_free_filedata(fd);
+		if (zip_sys_write_filedata(pathtree_file, fd, WINDOWS_OS_DATA_SIZE) != 0) {
+			zip_sys_free_filedata(fd);
+			free(fd);
+			return 1
+		};
 
 		char extra_chars[] = "/*";
 		char search_pattern[strlen(cur_filename) + strlen(extra_chars) + 1];
@@ -518,26 +564,39 @@ uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, con
 				strcpy(subfile_name, cur_filename);
 				strcat(subfile_name, "/");
 				strcat(subfile_name, subfile_data.cFileName);
-				zip_sys_lookup_win(pathtree_file, subfile_name, path_to_pack);
+				if (zip_sys_lookup_win(pathtree_file, subfile_name, path_to_pack) != 0)
+					return 1;
 			}
 		} while(FindNextFileA(pathtree_pos, &subfile_data));
 
 		if(!FindClose(pathtree_pos)){
-			abort();
+			return 1
 		}
 		
 	#endif
 }
 
 static uint32_t zip_sys_write_filedata(FILEOS *file, filedata_t *fd, uint32_t os_data_size){
-	zip_sys_fwrite(&(fd->os_ver), sizeof(uint16_t), 1, file);
-	zip_sys_fwrite(&(fd->modification_time), sizeof(uint16_t), 1, file);
-	zip_sys_fwrite(&(fd->modification_date), sizeof(uint16_t), 1, file);
-	zip_sys_fwrite(&(fd->internal_attrs), sizeof(uint16_t), 1, file);
-	zip_sys_fwrite(&(fd->external_attrs), sizeof(uint32_t), 1, file);
-	zip_sys_fwrite(fd->absolute_filename, sizeof(char), strlen(fd->absolute_filename) + 1, file);
-	zip_sys_fwrite(fd->relative_filename, sizeof(char), strlen(fd->relative_filename) + 1, file);
-	zip_sys_fwrite(fd->os_data, sizeof(uint8_t), os_data_size, file);
+	access(file != NULL && fd != NULL);
+
+	if (zip_sys_fwrite(&(fd->os_ver), sizeof(uint16_t), 1, file) != 1) return 1;
+	if (zip_sys_fwrite(&(fd->modification_time), sizeof(uint16_t), 1, file) != 1) return 1;
+	if (zip_sys_fwrite(&(fd->modification_date), sizeof(uint16_t), 1, file) != 1) return 1;
+	if (zip_sys_fwrite(&(fd->internal_attrs), sizeof(uint16_t), 1, file) != 1) return 1;
+	if (zip_sys_fwrite(&(fd->external_attrs), sizeof(uint32_t), 1, file) != 1) return 1;
+	if (
+			zip_sys_fwrite(fd->absolute_filename, sizeof(char), strlen(fd->absolute_filename) + 1, file) !=
+			strlen(fd->absolute_filename) + 1
+	) return 1;
+
+	if (
+			zip_sys_fwrite(fd->relative_filename, sizeof(char), strlen(fd->relative_filename) + 1, file) !=
+			strlen(fd->relative_filename) + 1
+	) return 1;
+
+	if (zip_sys_fwrite(fd->os_data, sizeof(uint8_t), os_data_size, file) != os_data_size) return 1;
+
+	return 0;
 }
 
 static uint32_t zip_sys_read_filedata(FILEOS *file, filedata_t *fd, uint32_t os_data_size){
@@ -560,6 +619,7 @@ static uint32_t zip_sys_read_filedata(FILEOS *file, filedata_t *fd, uint32_t os_
 		abs_filename_len++;
 	}
 	fd->absolute_filename = malloc((abs_filename_len + 1) * sizeof(char));
+	if (fd->absolute_filename != NULL) return 1;
 	strcpy(fd->absolute_filename, abs_filename);
 
 	char rel_filename[MAX_PATH];
@@ -574,9 +634,19 @@ static uint32_t zip_sys_read_filedata(FILEOS *file, filedata_t *fd, uint32_t os_
 		rel_filename_len++;
 	}
 	fd->relative_filename = malloc((rel_filename_len + 1) * sizeof(char));
+	if (fd->relative_filename != NULL){
+		free(fd->absolute_filename);
+		return 1;
+	}
 	strcpy(fd->relative_filename, rel_filename);
 
 	fd->os_data = malloc(os_data_size);
+	if (fd->os_data == NULL){
+		free(fd->absolute_filename);
+		free(fd->relative_filename);
+		return 1;
+	}
+
 	if (zip_sys_fread(fd->os_data, sizeof(uint8_t), os_data_size, file) != os_data_size) {
 		free(fd->absolute_filename);
 		free(fd->relative_filename);
@@ -645,7 +715,7 @@ FILEOS* zip_sys_fopen(const char *filename, const char *mode){
 		char dirname[dir_len + 1];
 		strncpy(dirname, filename, dir_len);
 		dirname[dir_len] = 0;
-		zip_sys_create_dir(dirname);
+		if (zip_sys_create_dir(dirname) == UINT32_MAX) return NULL;
 	}
 
 	#ifdef __WIN32__
@@ -835,7 +905,12 @@ void* zip_sys_create_mmf(FILEOS *stream, uintmax_t size, uint32_t access_mode){
 			mmf_size_high_half = (size >> 32) & UINT32_MAX;
 		uint32_t mmf_size_low_half = size & UINT32_MAX;
 
-		return CreateFileMappingA((HANDLE)stream, NULL, flProtect, mmf_size_high_half, mmf_size_low_half, NULL);
+		void* mmf = CreateFileMappingA((HANDLE)stream, NULL, flProtect, mmf_size_high_half, mmf_size_low_half, NULL);
+		if (GetLastError() == ERROR_ALREADY_EXISTS){
+			SetLastError(ERROR_SUCCESS);
+			return NULL;
+		}
+		return mmf;
 
 	#endif
 
@@ -946,17 +1021,17 @@ uint32_t zip_sys_f2f_data_transfer(
 
 		memcpy(view_file_out, view_file_in, view_size);
 
-		zip_sys_unmap_view(view_file_out, view_size);
-		zip_sys_unmap_view(view_file_in, view_size);
+		if (zip_sys_unmap_view(view_file_out, view_size) != 0) return 1;
+		if (zip_sys_unmap_view(view_file_in, view_size) != 0) return 1;
 	}
 
-	zip_sys_close_mmf(mm_file_in);
-	zip_sys_close_mmf(mm_file_out);
+	if (zip_sys_close_mmf(mm_file_in) != 0) return 1;
+	if (zip_sys_close_mmf(mm_file_out) != 0) return 1;
 
 	if (crc32 != NULL) *crc32 = crc32_optimized_lazy_execute(crc_val, crc32_ieee_8023, &crc_cache);
 
-	zip_sys_fseek(stream_out, 0, SEEK_END);
-	zip_sys_fseek(stream_in, 0, SEEK_END);
+	if (zip_sys_fseek(stream_out, 0, SEEK_END) != 0) return 1;
+	if (zip_sys_fseek(stream_in, 0, SEEK_END) != 0) return 1;
 
 	return 0;
 }
