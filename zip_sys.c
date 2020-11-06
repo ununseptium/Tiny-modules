@@ -528,7 +528,7 @@ static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filena
 			free(fd);
 			return 1
 		}
-		fd->relative_filename = zip_sys_cut_to_relative_filename(cur_filename, path_to_pack);
+		zip_sys_cut_to_relative_filename(cur_filename, path_to_pack, fd->relative_filename);
 
 		fd->absolute_filename = malloc(strlen(cur_filename) + 1);
 		if (fd->absolute_filename == NULL){
