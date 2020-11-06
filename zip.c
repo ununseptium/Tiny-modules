@@ -365,11 +365,11 @@ uint32_t zip_pack(
 		write_LFH(archive, ldfh_size, cur_file, NULL, 0, NULL, 0, &cur_lfh);
 		uint64_amd64_plus_uint64_amd64(&ldfh_size, cur_lfh);
 	}while(!zip_sys_process_next_file(fi, cur_file));
-	zip_sys_close_process(NULL, cur_file);
 
 	uint64_amd64_t relative_lfh_offset;
 	uint64_amd64_assign_uint64_amd64(&relative_lfh_offset, ldfh_offset);
 
+	zip_sys_reset_pathtree_info_pos(fi, cur_file);
 	cur_file = zip_sys_process_first_file(fi);
 	uint64_amd64_t cdfh_total = {0, 0};
 	uint64_amd64_t cdfh_size = {0, 0};
