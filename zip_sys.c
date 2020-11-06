@@ -101,6 +101,15 @@ uint32_t zip_sys_process_next_file(void *pathtree_info, fileinfo_t fi){
 	return 0;
 }
 
+uint32_t zip_sys_reset_pathtree_info_pos(void* pathtree_info, fileinfo_t fi){
+	if (pathtree_info == NULL || fi == NULL) return 1;
+
+	if (zip_sys_fseek((FILEOS*)pathtree_info, 0, SEEK_SET) != 0) return 1;
+	zip_sys_free_filedata_fields(fi);
+
+	return 0
+}
+
 uint32_t zip_sys_close_process(void *pathtree_info, fileinfo_t fi){
 	if (pathtree_info == NULL || fi == NULL) return 1;
 
