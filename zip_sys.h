@@ -154,17 +154,17 @@ uint32_t zip_sys_create_dir(const char *dirname);
 
 FILEOS* zip_sys_fopen(const char *filename, const char *mode);
 
-static void zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack);
+static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack);
 
 static uint32_t zip_sys_write_filedata(FILEOS *file, filedata_t *fd, uint32_t os_data_size);
 
 static uint32_t zip_sys_read_filedata(FILEOS *file, filedata_t *fd, uint32_t os_data_size);
 
-static uint32_t zip_sys_free_filedata_fields(filedata_t *fd);
+static void zip_sys_free_filedata_fields(filedata_t *fd);
 
-static uint32_t zip_sys_free_filedata(filedata_t *fd);
+static void zip_sys_free_filedata(filedata_t *fd);
 
-static char* zip_sys_cut_to_relative_filename(const char *abs_filename, const char *root);
+static char* zip_sys_cut_to_relative_filename(const char *abs_filename, const char *root, char *rel_filename);
 
 FILEOS* zip_sys_fopen(const char *filename, const char *mode);
 
