@@ -549,11 +549,9 @@ static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filena
 		memcpy(fd->os_data + sizeof(FILETIME), &(cur_filedata.ftLastAccessTime), sizeof(FILETIME));
 		memcpy(fd->os_data + sizeof(FILETIME) * 2, &(cur_filedata.ftCreationTime), sizeof(FILETIME));
 		
-		if (zip_sys_write_filedata(pathtree_file, fd, WINDOWS_OS_DATA_SIZE) != 0) {
-			zip_sys_free_filedata(fd);
-			free(fd);
-			return 1
-		};
+		uint32_t write_result = zip_sys_write_filedata(pathtree_file, fd, WINDOWS_OS_DATA_SIZE);
+		zip_sys_free_filedata(fd)
+		if (write_result != 0) return 1;
 
 		char extra_chars[] = "/*";
 		char search_pattern[strlen(cur_filename) + strlen(extra_chars) + 1];
