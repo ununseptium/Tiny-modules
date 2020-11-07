@@ -165,7 +165,6 @@ uint32_t zip_compress_and_encrypt_data_file(
 }
 
 int zip_find_next_lfh(FILEOS *zipf, uint64_amd64_t *offset){
-	printf("start\n");
 	zip_fpos_t init_pos;
 	zip_sys_fgetpos(zipf, &init_pos);
 
@@ -219,13 +218,11 @@ int zip_find_next_lfh(FILEOS *zipf, uint64_amd64_t *offset){
 	zip_bo_le_lfh(&next_lfh);
 
 	if (next_lfh.signature != 0x04034b50){
-		printf("fuck");
 		return 1;
 	}
 
 	zip_sys_fsetpos(zipf, &init_pos);
 
-	printf("end\n");
 	return 0;
 }
 
@@ -379,7 +376,6 @@ uint32_t zip_pack(
 		uint64_amd64_plus_uint64_amd64(&cdfh_size, cur_cfh_size);
 		uint64_amd64_plus_uint32(&cdfh_total, 1);
 	}while(!zip_sys_process_next_file(fi, cur_file) && !zip_find_next_lfh(archive, &relative_lfh_offset));
-	printf("%d\n", cdfh_total.low_half);
 	zip_sys_close_process(fi, cur_file);
 
 	write_EOCD(archive, ldfh_size, cdfh_total, cdfh_size, comment);
