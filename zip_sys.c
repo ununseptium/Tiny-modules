@@ -324,7 +324,7 @@ static uint16_t zip_sys_get_zip64_extra_block(
 
 static uint16_t zip_sys_get_ntfs_extra_block(uint8_t *ntfs_extra_block, fileinfo_t fi){
 	#ifdef __WIN32__
-		access(fi != NULL);
+		assert(fi != NULL);
 		if (fi->os_data == NULL) return 0;
 
 		uint16_t ntfs_tag = 0xa;
@@ -504,7 +504,7 @@ uint32_t zip_sys_process_zip64(
 
 static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filename, const char* path_to_pack){
 	#ifdef __WIN32__
-		access(pathtree_file != NULL && cur_filename != NULL && path_to_pack != NULL);
+		assert(pathtree_file != NULL && cur_filename != NULL && path_to_pack != NULL);
 
 		uint32_t file_exist = zip_sys_is_file_exist(cur_filename);
 		assert(file_exist && file_exist != UINT32_MAX);
@@ -590,7 +590,7 @@ static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filena
 }
 
 static uint32_t zip_sys_write_filedata(FILEOS *file, filedata_t *fd, uint32_t os_data_size){
-	access(file != NULL && fd != NULL);
+	assert(file != NULL && fd != NULL);
 
 	if (zip_sys_fwrite(&(fd->os_ver), sizeof(uint16_t), 1, file) != 1) return 1;
 	if (zip_sys_fwrite(&(fd->modification_time), sizeof(uint16_t), 1, file) != 1) return 1;
@@ -613,7 +613,7 @@ static uint32_t zip_sys_write_filedata(FILEOS *file, filedata_t *fd, uint32_t os
 }
 
 static uint32_t zip_sys_read_filedata(FILEOS *file, filedata_t *fd, uint32_t os_data_size){
-	access(file != NULL && fd != NULL);
+	assert(file != NULL && fd != NULL);
 
 	if (zip_sys_fread(&(fd->os_ver), sizeof(uint16_t), 1, file) != 1) return 1;
 	if (zip_sys_fread(&(fd->modification_time), sizeof(uint16_t), 1, file) != 1) return 1;
@@ -687,7 +687,7 @@ static void zip_sys_free_filedata(filedata_t *fd){
 }
 
 static char* zip_sys_cut_to_relative_filename(const char *abs_filename, const char *root, char *rel_filename){
-	access(abs_filename != NULL && root != NULL && rel_filename != NULL);
+	assert(abs_filename != NULL && root != NULL && rel_filename != NULL);
 	
 	uint32_t root_len = strlen(root);
 	uint32_t root_offset = root_len;
