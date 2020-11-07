@@ -589,6 +589,8 @@ static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filena
 		return 0;
 		
 	#endif
+	
+	return 1;
 }
 
 static uint32_t zip_sys_write_filedata(FILEOS *file, filedata_t *fd, uint32_t os_data_size){
