@@ -57,7 +57,7 @@ void* zip_sys_collect_pathtree_info(const char* path){
 			zip_sys_fclose(pathtree_info_file);
 			return NULL;
 		}
-		return pathtree_info_file
+		return pathtree_info_file;
 	#endif 
 
 	return NULL;
@@ -72,7 +72,7 @@ fileinfo_t zip_sys_process_first_file(void *pathtree_info){
 	uint64_amd64_t zero_offset = {0, 0};
 	zip_amd64_fseek(pathtree_info_file, zero_offset, SEEK_SET);
 	filedata_t *fd = malloc(sizeof(filedata_t));
-	if (fd == NULL) return NULL
+	if (fd == NULL) return NULL;
 
 	#ifdef __WIN32__
 		if (zip_sys_read_filedata(pathtree_info_file, fd, WINDOWS_OS_DATA_SIZE)){
@@ -107,7 +107,7 @@ uint32_t zip_sys_reset_pathtree_info_pos(void* pathtree_info, fileinfo_t fi){
 	if (zip_sys_fseek((FILEOS*)pathtree_info, 0, SEEK_SET) != 0) return 1;
 	zip_sys_free_filedata_fields(fi);
 
-	return 0
+	return 0;
 }
 
 uint32_t zip_sys_close_process(void *pathtree_info, fileinfo_t fi){
@@ -395,8 +395,8 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uint64_amd64
 	uint8_t *pre_extra_data_eocd = malloc(*pre_extra_data_eocd_size);
 	if (pre_extra_data_eocd == NULL){
 		*pre_extra_data_eocd_size = 1;
-		return NULL
-	};
+		return NULL;
+	}
 	
 	struct Zip64EndOfCentralDirectory zip64_eocd;
 	zip64_eocd.signature = 0x06064b50;
@@ -535,7 +535,7 @@ static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filena
 		fd->relative_filename = malloc(strlen(cur_filename) + 1);
 		if (fd->relative_filename == NULL){
 			free(fd);
-			return 1
+			return 1;
 		}
 		zip_sys_cut_to_relative_filename(cur_filename, path_to_pack, fd->relative_filename);
 
@@ -559,7 +559,7 @@ static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filena
 		memcpy(fd->os_data + sizeof(FILETIME) * 2, &(cur_filedata.ftCreationTime), sizeof(FILETIME));
 		
 		uint32_t write_result = zip_sys_write_filedata(pathtree_file, fd, WINDOWS_OS_DATA_SIZE);
-		zip_sys_free_filedata(fd)
+		zip_sys_free_filedata(fd);
 		if (write_result != 0) return 1;
 
 		char extra_chars[] = "/*";
@@ -583,7 +583,7 @@ static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filena
 		} while(FindNextFileA(pathtree_pos, &subfile_data));
 
 		if(!FindClose(pathtree_pos)){
-			return 1
+			return 1;
 		}
 		
 	#endif
