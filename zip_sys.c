@@ -325,7 +325,7 @@ static uint16_t zip_sys_get_zip64_extra_block(
 static uint16_t zip_sys_get_ntfs_extra_block(uint8_t *ntfs_extra_block, fileinfo_t fi){
 	#ifdef __WIN32__
 		assert(fi != NULL);
-		if (fi->os_data == NULL) return 0;
+		if (((filedata_t*)fi)->os_data == NULL) return 0;
 
 		uint16_t ntfs_tag = 0xa;
 		zip_bo_le_uint16(&ntfs_tag);
@@ -632,7 +632,7 @@ static uint32_t zip_sys_read_filedata(FILEOS *file, filedata_t *fd, uint32_t os_
 		abs_filename_len++;
 	}
 	fd->absolute_filename = malloc((abs_filename_len + 1) * sizeof(char));
-	if (fd->absolute_filename != NULL) return 1;
+	if (fd->absolute_filename == NULL) return 1;
 	strcpy(fd->absolute_filename, abs_filename);
 
 	char rel_filename[MAX_PATH];
@@ -647,7 +647,7 @@ static uint32_t zip_sys_read_filedata(FILEOS *file, filedata_t *fd, uint32_t os_
 		rel_filename_len++;
 	}
 	fd->relative_filename = malloc((rel_filename_len + 1) * sizeof(char));
-	if (fd->relative_filename != NULL){
+	if (fd->relative_filename == NULL){
 		free(fd->absolute_filename);
 		return 1;
 	}
