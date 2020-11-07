@@ -585,6 +585,8 @@ static uint32_t zip_sys_lookup_win(FILEOS* pathtree_file, const char* cur_filena
 		if(!FindClose(pathtree_pos)){
 			return 1;
 		}
+
+		return 0;
 		
 	#endif
 }
