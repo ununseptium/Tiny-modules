@@ -703,7 +703,7 @@ static char* zip_sys_cut_to_relative_filename(const char *abs_filename, const ch
 
 	strcpy(rel_filename, abs_filename + root_offset);
 
-	return relative_filename;
+	return rel_filename;
 } 
 
 uint32_t zip_sys_create_dir(const char *dirname){
