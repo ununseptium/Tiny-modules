@@ -148,7 +148,7 @@ fileinfo_t zip_sys_process_first_file(void* pathtree_info);
 
 uint32_t zip_sys_process_next_file(void* pathtree_info, fileinfo_t fi);
 
-uint32_t zip_sys_reset_pathtree_info_pos(void pathtree_info, fileinfo_t, fi);
+uint32_t zip_sys_reset_pathtree_info_pos(void* pathtree_info, fileinfo_t fi);
 
 uint32_t zip_sys_close_process(void* pathtree_info, fileinfo_t fi);
 
