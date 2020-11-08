@@ -227,16 +227,23 @@ void* zip_sys_get_extra_data_cfh(
 	zip64_field.uncompressedSize = NULL;
 	zip64_field.correspondingHeaderOffset = NULL;
 
-	if (lfh.uncompressedSize == UINT32_MAX)
+	uint32_t is_zip64_format = 0;
+	if (lfh.uncompressedSize == UINT32_MAX){
 		zip64_field.uncompressedSize = &uncompressed_size;
+		is_zip64_format = 1;
+	}
 
-	if (lfh.compressedSize == UINT32_MAX)
+	if (lfh.compressedSize == UINT32_MAX){
 		zip64_field.compressedSize = &compressed_size;
+		is_zip64_format = 1;
+	}
 
-	uint32_t res = zip_sys_process_zip64(extra_data_lfh, lfh.extraFieldLength, zip64_field);
-	if (res != 0){
-		free(extra_data);
-		return NULL;
+	if (is_zip64_format){
+		uint32_t res = zip_sys_process_zip64(extra_data_lfh, lfh.extraFieldLength, zip64_field);
+		if (res != 0){
+			free(extra_data);
+			return NULL;
+		}
 	}
 
 	zip64_field.correspondingHeaderOffset = &lfh_offset;
