@@ -380,6 +380,6 @@ uint32_t zip_pack(
 
 	write_EOCD(archive, ldfh_size, cdfh_total, cdfh_size, comment);
 
-	fclose(archive);
+	zip_sys_fclose(archive);
 	return 0;
 }
