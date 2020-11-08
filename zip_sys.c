@@ -675,12 +675,18 @@ static uint32_t zip_sys_read_filedata(FILEOS *file, filedata_t *fd, uint32_t os_
 }
 
 static void zip_sys_free_filedata_fields(filedata_t *fd){
-	if (fd->relative_filename != NULL)
+	if (fd->relative_filename != NULL){
 		free(fd->relative_filename);
-	if (fd->absolute_filename == NULL)
+		fd->relative_filename = NULL;
+	}
+	if (fd->absolute_filename != NULL){
 		free(fd->absolute_filename);
-	if (fd->os_data == NULL)
+		fd->absolute_filename = NULL;
+	}
+	if (fd->os_data != NULL){
 		free(fd->os_data);
+		fd->os_data = NULL;
+	}
 }
 
 static void zip_sys_free_filedata(filedata_t *fd){
