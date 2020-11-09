@@ -71,9 +71,9 @@ typedef struct _uint64_amd64{
 #ifndef _ZIP64_EXTRA_FIELD_DEFINED
 #define _ZIP64_EXTRA_FIELD_DEFINED
 struct Zip64ExtraField {
-	uint64_amd64_t *uncompressedSize;
-	uint64_amd64_t *compressedSize;
-	uint64_amd64_t *correspondingHeaderOffset;
+	uintmax_t *uncompressedSize;
+	uintmax_t *compressedSize;
+	uintmax_t *correspondingHeaderOffset;
 };
 #endif
 
