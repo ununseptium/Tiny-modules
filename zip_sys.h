@@ -81,15 +81,15 @@ struct Zip64ExtraField {
 #define _ZIP64_END_OF_CENTRAL_DIRECTORY_DEFINED
 struct Zip64EndOfCentralDirectory {
     uint32_t signature;
-    uint64_amd64_t sizeOfZip64EndOfCentralDirectory;
+    uintmax_t sizeOfZip64EndOfCentralDirectory;
     uint16_t versionMadeBy;
     uint16_t versionToExtract;
     uint32_t diskNumber;
     uint32_t startDiskNumber;
-    uint64_amd64_t numberCentralDirectoryRecord;
-    uint64_amd64_t totalCentralDirectoryRecord;
-    uint64_amd64_t sizeOfCentralDirectory;
-    uint64_amd64_t centralDirectoryOffset;
+    uintmax_t numberCentralDirectoryRecord;
+    uintmax_t totalCentralDirectoryRecord;
+    uintmax_t sizeOfCentralDirectory;
+    uintmax_t centralDirectoryOffset;
 }__attribute__((packed));
 #endif
 
