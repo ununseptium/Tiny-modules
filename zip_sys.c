@@ -383,9 +383,9 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uintmax_t cd
 	if (pre_extra_data_eocd_size == NULL) return NULL;
 
 	if (
-			uint64_amd64_lt_uint32(cdfh_offset, UINT32_MAX) &&
-			uint64_amd64_lt_uint32(cdfh_total, (uint32_t)UINT16_MAX) &&
-			uint64_amd64_lt_uint32(cdfh_size, UINT32_MAX)
+			cdfh_offset < UINT32_MAX &&
+			cdfh_total < UINT16_MAX &&
+			cdfh_size < UINT32_MAX
 	){
 		*pre_extra_data_eocd_size = 0;
 		return NULL;
