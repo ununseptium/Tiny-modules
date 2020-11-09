@@ -843,11 +843,11 @@ uint32_t zip_sys_fgetpos(FILEOS *stream, zip_fpos_t *pos){
 		uint32_t pos_high_half = 0;
 		uint32_t pos_low_half = SetFilePointer(stream, 0, (LONG*)&pos_high_half, FILE_CURRENT);
 		if (pos_low_half == INVALID_SET_FILE_POINTER) return 1;
-		pos->high_half = 0;
+		*pos = 0;
 		if (pos_high_half != 0){
-			pos->high_half = pos_high_half; 
+			*pos |= (zip_fpos_t)pos_high_half << 32; 
 		}
-		pos->low_half = pos_low_half;
+		*pos |= pos_low_half;
 	#endif
 
 	return 1;
