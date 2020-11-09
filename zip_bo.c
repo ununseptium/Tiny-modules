@@ -121,3 +121,23 @@ void zip_bo_le_zip64_eocdl(struct Zip64EndOfCentralDirectoryLocator *zip64_eocdl
 		zip64_eocdl->totalDisks = zip_bo_reverse_uint32(zip64_eocdl->totalDisks);
 	}
 }
+
+uintmax_t zip_bo_reverse_uintmax(uintmax_t uintmax){
+	uintmax_t val = 0;
+	if (sizeof(uintmax_t) == sizeof(uint32_t)){
+		val = (uintmax >> 24) & 0xff;
+		val = (uintmax >> 8) & 0xff00;
+		val = (uintmax << 8) & 0xff0000;
+		val = (uintmax << 24) & 0xff000000;
+		return val;
+	}else{
+		val = (uintmax >> 56) & 0xff;
+		val = (uintmax >> 40) & 0xff00;
+		val = (uintmax >> 24) & 0xff0000;
+		val = (uintmax >> 8) & 0xff000000;
+		val = (uintmax << 8) & 0xff00000000;
+		val = (uintmax << 24) & 0xff0000000000;
+		val = (uintmax << 30) & 0xff000000000000;
+		val = (uintmax << 56) & 0xff00000000000000;
+	}
+}
