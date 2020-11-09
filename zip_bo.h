@@ -86,7 +86,7 @@ struct Zip64EndOfCentralDirectory {
 struct Zip64EndOfCentralDirectoryLocator {
     uint32_t signature;
     uint32_t diskNumber;
-    uint64_amd64_t zip64EndOfCentralDirectoryOffset;
+    uintmax_t zip64EndOfCentralDirectoryOffset;
     uint32_t totalDisks;
 }__attribute__((packed));
 #endif
