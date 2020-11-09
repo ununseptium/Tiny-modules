@@ -219,8 +219,8 @@ void* zip_sys_get_extra_data_cfh(
 
 	*extra_data_cfh_size = 0;
 
-	uint64_amd64_t uncompressed_size = {0, 0};
-	uint64_amd64_t compressed_size = {0, 0};
+	uintmax_t uncompressed_size = 0;
+	uintmax_t compressed_size = 0;
 	struct Zip64ExtraField zip64_field;
 	zip64_field.compressedSize = NULL;
 	zip64_field.uncompressedSize = NULL;
