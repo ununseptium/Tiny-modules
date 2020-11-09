@@ -116,4 +116,7 @@ void zip_bo_le_zip64_eocd(struct Zip64EndOfCentralDirectory *zip64_eocd);
 void zip_bo_le_zip64_eocdl(struct Zip64EndOfCentralDirectoryLocator *zip64_eocdl);
 
 uintmax_t zip_bo_reverse_uintmax(uintmax_t uintmax);
+
+void zip_bo_le_uintmax(uintmax_t *uintmax);
+
 #endif
