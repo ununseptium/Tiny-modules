@@ -271,21 +271,21 @@ static uint16_t zip_sys_get_zip64_extra_block(
 
 	uint16_t zip64_block_size = 0;
 	if (
-			zip64_field.uncompressedSize != NULL && 
-			uint64_amd64_ge_uint32(*(zip64_field.uncompressedSize), UINT32_MAX)
+			zip64_field.uncompressedSize != NULL &&
+			*zip64_field.uncompressedSize >= UINT32_MAX
 	)
 		zip64_block_size += sizeof(*(zip64_field.uncompressedSize));
 
 	if (
 			zip64_field.compressedSize != NULL && 
-			uint64_amd64_ge_uint32(*(zip64_field.compressedSize), UINT32_MAX)
+			*zip64_field.compressedSize >= UINT32_MAX
 	)
  
 		zip64_block_size += sizeof(*(zip64_field.compressedSize));
 
 	if (
 			zip64_field.correspondingHeaderOffset != NULL && 
-			uint64_amd64_ge_uint32(*(zip64_field.correspondingHeaderOffset), UINT32_MAX)
+			*zip64_field.correspondingHeaderOffset >= UINT32_MAX
 	) 
 		zip64_block_size += sizeof(*(zip64_field.correspondingHeaderOffset));
 
@@ -297,9 +297,9 @@ static uint16_t zip_sys_get_zip64_extra_block(
 	uint16_t offset = 4;
 	if (
 			zip64_field.uncompressedSize != NULL && 
-			uint64_amd64_ge_uint32(*(zip64_field.uncompressedSize), UINT32_MAX)
+			*zip64_field.uncompressedSize >= UINT32_MAX
 	){
-		zip_bo_le_uint64_amd64(zip64_field.uncompressedSize);
+		zip_bo_le_uintmax(zip64_field.uncompressedSize);
 		memcpy(zip64_extra_block + offset, zip64_field.uncompressedSize, sizeof(*(zip64_field.uncompressedSize)));
 
 		offset += sizeof(*(zip64_field.uncompressedSize));
@@ -307,9 +307,9 @@ static uint16_t zip_sys_get_zip64_extra_block(
 
 	if (
 			zip64_field.compressedSize != NULL &&
-			uint64_amd64_ge_uint32(*(zip64_field.compressedSize), UINT32_MAX)
+			*zip64_field.compressedSize >= UINT32_MAX
 	){
-		zip_bo_le_uint64_amd64(zip64_field.compressedSize);
+		zip_bo_le_uintmax(zip64_field.compressedSize);
 		memcpy(zip64_extra_block + offset, zip64_field.compressedSize, sizeof(*(zip64_field.compressedSize)));
 
 		offset += sizeof(*(zip64_field.compressedSize));
@@ -317,9 +317,9 @@ static uint16_t zip_sys_get_zip64_extra_block(
 
 	if (
 			zip64_field.correspondingHeaderOffset != NULL &&
-			uint64_amd64_ge_uint32(*(zip64_field.correspondingHeaderOffset), UINT32_MAX)
+			*zip64_field.correspondingHeaderOffset >= UINT32_MAX
 	){
-		zip_bo_le_uint64_amd64(zip64_field.correspondingHeaderOffset);
+		zip_bo_le_uintmax(zip64_field.correspondingHeaderOffset);
 		memcpy(zip64_extra_block + offset, zip64_field.correspondingHeaderOffset, sizeof(*(zip64_field.correspondingHeaderOffset)));
 
 		offset += sizeof(*(zip64_field.correspondingHeaderOffset));
@@ -407,19 +407,19 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uint64_amd64
 	struct Zip64EndOfCentralDirectory zip64_eocd;
 	zip64_eocd.signature = 0x06064b50;
 
-	uint64_amd64_assign_uint32(&(zip64_eocd.sizeOfZip64EndOfCentralDirectory), sizeof(struct Zip64EndOfCentralDirectory));
-	uint64_amd64_plus_uint32(&(zip64_eocd.sizeOfZip64EndOfCentralDirectory), zip64_data_sector_size);
-	uint64_amd64_minus_uint32(&(zip64_eocd.sizeOfZip64EndOfCentralDirectory), 12);
+	zip64_eocd.sizeOfZip64EndOfCentralDirectory = sizeof(struct Zip64EndOfCentralDirectory);
+	zip64_eocd.sizeOfZip64EndOfCentralDirectory += zip64_data_sector_size;
+	zip64_eocd.sizeOfZip64EndOfCentralDirectory -= 12;
 
 	zip64_eocd.versionMadeBy = zip_sys_get_machine_os_version();
 	zip64_eocd.versionToExtract = 0;
 	zip64_eocd.diskNumber = 0;
 	zip64_eocd.startDiskNumber = 0;
 
-	uint64_amd64_assign_uint64_amd64(&(zip64_eocd.numberCentralDirectoryRecord), cdfh_total);
-	uint64_amd64_assign_uint64_amd64(&(zip64_eocd.totalCentralDirectoryRecord), cdfh_total);
-	uint64_amd64_assign_uint64_amd64(&(zip64_eocd.sizeOfCentralDirectory), cdfh_size);
-	uint64_amd64_assign_uint64_amd64(&(zip64_eocd.centralDirectoryOffset), cdfh_offset);
+	zip64_eocd.numberCentralDirectoryRecord = cdfh_total;
+	zip64_eocd.totalCentralDirectoryRecord = cdfh_total;
+	zip64_eocd.sizeOfCentralDirectory = cdfh_size;
+	zip64_eocd.centralDirectoryOffset = cdfh_offset;
 
 	zip_bo_le_zip64_eocd(&zip64_eocd);
 	memcpy(pre_extra_data_eocd, &zip64_eocd, sizeof(struct Zip64EndOfCentralDirectory));
@@ -429,8 +429,8 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uint64_amd64
 	zip64_eocdl.diskNumber = 0;
 	zip64_eocdl.totalDisks = 1;
 
-	uint64_amd64_assign_uint64_amd64(&(zip64_eocdl.zip64EndOfCentralDirectoryOffset), cdfh_offset);
-	uint64_amd64_plus_uint64_amd64(&(zip64_eocdl.zip64EndOfCentralDirectoryOffset), cdfh_size);
+	zip64_eocdl.zip64EndOfCentralDirectoryOffset = cdfh_offset;
+	zip64_eocdl.zip64EndOfCentralDirectoryOffset += cdfh_size;
 
 	zip_bo_le_zip64_eocdl(&zip64_eocdl);
 	memcpy(
@@ -483,7 +483,7 @@ uint32_t zip_sys_process_zip64(
 
 	if(zip64_field.uncompressedSize != NULL && sizeof(*(zip64_field.uncompressedSize)) <= data_residue){
 		memcpy(zip64_field.uncompressedSize, next_zip64_field, sizeof(*(zip64_field.uncompressedSize)));
-		zip_bo_le_uint64_amd64(zip64_field.uncompressedSize);
+		zip_bo_le_uintmax(zip64_field.uncompressedSize);
 
 		data_residue -= sizeof(*(zip64_field.uncompressedSize));
 		next_zip64_field += sizeof(*(zip64_field.uncompressedSize));
@@ -491,7 +491,7 @@ uint32_t zip_sys_process_zip64(
 
 	if (zip64_field.compressedSize != NULL && sizeof(*(zip64_field.compressedSize)) <= data_residue){
 		memcpy(zip64_field.compressedSize, next_zip64_field, sizeof(*(zip64_field.compressedSize)));
-		zip_bo_le_uint64_amd64(zip64_field.compressedSize);
+		zip_bo_le_uintmax(zip64_field.compressedSize);
 
 		data_residue -= sizeof(*(zip64_field.compressedSize));
 		next_zip64_field += sizeof(*(zip64_field.compressedSize));
@@ -499,7 +499,7 @@ uint32_t zip_sys_process_zip64(
 
 	if (zip64_field.correspondingHeaderOffset != NULL && sizeof(*(zip64_field.correspondingHeaderOffset)) <= data_residue){
 		memcpy(zip64_field.correspondingHeaderOffset, next_zip64_field, sizeof(*(zip64_field.correspondingHeaderOffset)));
-		zip_bo_le_uint64_amd64(zip64_field.correspondingHeaderOffset);
+		zip_bo_le_uintmax(zip64_field.correspondingHeaderOffset);
 
 		data_residue -= sizeof(*(zip64_field.correspondingHeaderOffset));
 		next_zip64_field += sizeof(*(zip64_field.correspondingHeaderOffset));
