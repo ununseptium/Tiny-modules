@@ -172,7 +172,7 @@ const char* zip_sys_get_relative_filename(fileinfo_t fi){
 	return ((filedata_t*)fi)->relative_filename;
 }
 
-void* zip_sys_get_extra_data_lfh(uint16_t* extra_data_lfh_size, fileinfo_t fi, uint64_amd64_t uncompressed_size, uint64_amd64_t compressed_size){
+void* zip_sys_get_extra_data_lfh(uint16_t* extra_data_lfh_size, fileinfo_t fi, uintmax_t uncompressed_size, uintmax_t compressed_size){
 	if (extra_data_lfh_size == NULL) return NULL;
 
 	uint16_t zip64_block_max_size = 32;
@@ -199,7 +199,7 @@ void* zip_sys_get_extra_data_lfh(uint16_t* extra_data_lfh_size, fileinfo_t fi, u
 }
 
 void* zip_sys_get_extra_data_cfh(
-		uint16_t* extra_data_cfh_size, fileinfo_t fi, uint64_amd64_t lfh_offset,
+		uint16_t* extra_data_cfh_size, fileinfo_t fi, uintmax_t lfh_offset,
 		struct LocalFileHeader lfh, void *extra_data_lfh
 ){
 	if (extra_data_cfh_size == NULL) return NULL;
@@ -379,7 +379,7 @@ static uint16_t zip_sys_get_ntfs_extra_block(uint8_t *ntfs_extra_block, fileinfo
 	return 0;
 }
 
-void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uint64_amd64_t cdfh_offset, uint64_amd64_t cdfh_total, uint64_amd64_t cdfh_size){
+void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uintmax_t cdfh_offset, uintmax_t cdfh_total, uintmax_t cdfh_size){
 	if (pre_extra_data_eocd_size == NULL) return NULL;
 
 	if (

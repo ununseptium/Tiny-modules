@@ -115,10 +115,10 @@ const char* zip_sys_get_relative_filename(fileinfo_t fi);
 
 const char* zip_sys_get_absolute_filename(fileinfo_t fi);
 
-void* zip_sys_get_extra_data_lfh(uint16_t* extra_data_size, fileinfo_t fi, uint64_amd64_t uncompressed_size, uint64_amd64_t compressed_size);
+void* zip_sys_get_extra_data_lfh(uint16_t* extra_data_size, fileinfo_t fi, uintmax_t uncompressed_size, uintmax_t compressed_size);
 
 void* zip_sys_get_extra_data_cfh(
-		uint16_t* extra_data_size, fileinfo_t fi, uint64_amd64_t lfd_offset,
+		uint16_t* extra_data_size, fileinfo_t fi, uintmax_t lfd_offset,
 		struct LocalFileHeader lfh, void *extra_data_lfh
 );
 
@@ -128,7 +128,7 @@ static uint16_t zip_sys_get_zip64_extra_block(
 
 static uint16_t zip_sys_get_ntfs_extra_block(uint8_t *ntfs_extra_block, fileinfo_t fi);
 
-void* zip_sys_get_pre_eocd_data(uint16_t *pre_data_size, uint64_amd64_t cdfh_offset, uint64_amd64_t cdfh_total, uint64_amd64_t cdfh_size);
+void* zip_sys_get_pre_eocd_data(uint16_t *pre_data_size, uintmax_t cdfh_offset, uintmax_t cdfh_total, uintmax_t cdfh_size);
 
 uint32_t zip_sys_process_zip64(
 		const uint8_t *extra_data, uint16_t extra_data_size, struct Zip64ExtraField zip64_field
