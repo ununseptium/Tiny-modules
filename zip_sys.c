@@ -857,7 +857,8 @@ uint32_t zip_sys_fsetpos(FILEOS *stream, zip_fpos_t *pos){
 	if (stream == NULL || pos == NULL) return 1;
 
 	#ifdef __WIN32__
-		if (SetFilePointer(stream, pos->low_half, (LONG*)&(pos->high_half), FILE_BEGIN) != INVALID_SET_FILE_POINTER)
+		uint32_t pos_high = *pos >> 32;
+		if (SetFilePointer(stream, (*pos & UINT32_MAX), (LONG*)&(pos_high), FILE_BEGIN) != INVALID_SET_FILE_POINTER)
 			return 0;
 	#endif
 
