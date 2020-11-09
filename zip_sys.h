@@ -8,7 +8,6 @@
 #include <string.h>
 #include <time.h>
 #include <crc32.h>
-#include <zip_amd64.h>
 #include <zip_bo.h>
 
 #ifdef __WIN32__
