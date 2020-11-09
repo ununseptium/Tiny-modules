@@ -69,8 +69,7 @@ fileinfo_t zip_sys_process_first_file(void *pathtree_info){
 	}
 
 	FILEOS *pathtree_info_file = (FILEOS*)pathtree_info;
-	uint64_amd64_t zero_offset = {0, 0};
-	zip_amd64_fseek(pathtree_info_file, zero_offset, SEEK_SET);
+	if (zip_sys_fseek(pathtree_info_file, 0, SEEK_SET) != 0) return NULL;
 	filedata_t *fd = malloc(sizeof(filedata_t));
 	if (fd == NULL) return NULL;
 
