@@ -13,7 +13,7 @@
 
 #ifdef __WIN32__
 #include <windows.h>
-#define zip_fpos_t uint64_amd64_t
+#define zip_fpos_t uintmax_t
 #endif
 
 #define WINDOWS_OS_VER 10
