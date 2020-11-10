@@ -68,7 +68,7 @@ struct EOCD {
 
 #ifndef _ZIP64_EXTRA_FIELD_DEFINED
 #define _ZIP64_EXTRA_FIELD_DEFINED
-struct Zip64ExtraField {
+struct zip64_extra_field {
 	uintmax_t *uncompressedSize;
 	uintmax_t *compressedSize;
 	uintmax_t *correspondingHeaderOffset;

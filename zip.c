@@ -194,7 +194,7 @@ int zip_find_next_lfh(FILEOS *zipf, uintmax_t *offset){
 		*offset += lfh.extraFieldLength;
 
 		uintmax_t compressed_size = 0;
-		struct Zip64ExtraField zip64_field;
+		struct zip64_extra_field zip64_field;
 		zip64_field.compressedSize = &compressed_size;
 		zip64_field.correspondingHeaderOffset = NULL;
 
