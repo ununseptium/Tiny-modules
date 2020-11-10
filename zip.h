@@ -66,14 +66,6 @@ struct EOCD {
 }__attribute__((packed));
 #endif
 
-#ifndef _UINT64_AMD64_DEFINED
-#define _UINT64_AMD64_DEFINED
-typedef struct _uint64_amd64{
-	uint32_t low_half;
-	uint32_t high_half;
-} uint64_amd64_t;
-#endif
-
 #ifndef _ZIP64_EXTRA_FIELD_DEFINED
 #define _ZIP64_EXTRA_FIELD_DEFINED
 struct Zip64ExtraField {
