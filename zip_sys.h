@@ -70,7 +70,7 @@ struct Zip64ExtraField {
 
 #ifndef _ZIP64_END_OF_CENTRAL_DIRECTORY_DEFINED
 #define _ZIP64_END_OF_CENTRAL_DIRECTORY_DEFINED
-struct Zip64EndOfCentralDirectory {
+struct zip64_end_of_central_directory {
     uint32_t signature;
     uintmax_t sizeOfZip64EndOfCentralDirectory;
     uint16_t versionMadeBy;

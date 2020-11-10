@@ -67,7 +67,7 @@ struct EOCD {
 
 #ifndef _ZIP64_END_OF_CENTRAL_DIRECTORY_DEFINED
 #define _ZIP64_END_OF_CENTRAL_DIRECTORY_DEFINED
-struct Zip64EndOfCentralDirectory {
+struct zip64_end_of_central_directory {
     uint32_t signature;
     uintmax_t sizeOfZip64EndOfCentralDirectory;
     uint16_t versionMadeBy;
@@ -111,7 +111,7 @@ void zip_bo_reverse_uint64_amd64(uint64_amd64_t *uint64);
 
 void zip_bo_le_uint64_amd64(uint64_amd64_t *uint64);
 
-void zip_bo_le_zip64_eocd(struct Zip64EndOfCentralDirectory *zip64_eocd);
+void zip_bo_le_zip64_eocd(struct zip64_end_of_central_directory *zip64_eocd);
 
 void zip_bo_le_zip64_eocdl(struct Zip64EndOfCentralDirectoryLocator *zip64_eocdl);
 

@@ -394,7 +394,7 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uintmax_t cd
 	void *zip64_data_sector = NULL;
 	uint16_t zip64_data_sector_size = 0;
 	*pre_extra_data_eocd_size =
-		sizeof(struct Zip64EndOfCentralDirectory) +
+		sizeof(struct zip64_end_of_central_directory) +
 		sizeof(struct Zip64EndOfCentralDirectoryLocator) +
 		zip64_data_sector_size;
 
@@ -404,10 +404,10 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uintmax_t cd
 		return NULL;
 	}
 	
-	struct Zip64EndOfCentralDirectory zip64_eocd;
+	struct zip64_end_of_central_directory zip64_eocd;
 	zip64_eocd.signature = 0x06064b50;
 
-	zip64_eocd.sizeOfZip64EndOfCentralDirectory = sizeof(struct Zip64EndOfCentralDirectory);
+	zip64_eocd.sizeOfZip64EndOfCentralDirectory = sizeof(struct zip64_end_of_central_directory);
 	zip64_eocd.sizeOfZip64EndOfCentralDirectory += zip64_data_sector_size;
 	zip64_eocd.sizeOfZip64EndOfCentralDirectory -= 12;
 
@@ -422,7 +422,7 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uintmax_t cd
 	zip64_eocd.centralDirectoryOffset = cdfh_offset;
 
 	zip_bo_le_zip64_eocd(&zip64_eocd);
-	memcpy(pre_extra_data_eocd, &zip64_eocd, sizeof(struct Zip64EndOfCentralDirectory));
+	memcpy(pre_extra_data_eocd, &zip64_eocd, sizeof(struct zip64_end_of_central_directory));
 
 	struct Zip64EndOfCentralDirectoryLocator zip64_eocdl;
 	zip64_eocdl.signature = 0x07064b50;
@@ -434,13 +434,13 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uintmax_t cd
 
 	zip_bo_le_zip64_eocdl(&zip64_eocdl);
 	memcpy(
-			pre_extra_data_eocd + sizeof(struct Zip64EndOfCentralDirectory),
+			pre_extra_data_eocd + sizeof(struct zip64_end_of_central_directory),
 			&zip64_eocdl,
 			sizeof(struct Zip64EndOfCentralDirectoryLocator)
 	);
 
 	memcpy(
-			pre_extra_data_eocd + sizeof(struct Zip64EndOfCentralDirectory) + sizeof(struct Zip64EndOfCentralDirectoryLocator),
+			pre_extra_data_eocd + sizeof(struct zip64_end_of_central_directory) + sizeof(struct Zip64EndOfCentralDirectoryLocator),
 			zip64_data_sector,
 			zip64_data_sector_size
 	);

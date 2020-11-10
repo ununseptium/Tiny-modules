@@ -98,7 +98,7 @@ void zip_bo_le_uint64_amd64(uint64_amd64_t *uint64){
 	}
 }
 
-void zip_bo_le_zip64_eocd(struct Zip64EndOfCentralDirectory *zip64_eocd){
+void zip_bo_le_zip64_eocd(struct zip64_end_of_central_directory *zip64_eocd){
 	if (!zip_bo_is_le() && zip64_eocd != NULL){
 		zip64_eocd->signature = zip_bo_reverse_uint32(zip64_eocd->signature);
 		zip_bo_reverse_uint64_amd64(&(zip64_eocd->sizeOfZip64EndOfCentralDirectory));
