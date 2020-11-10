@@ -184,7 +184,7 @@ void* zip_sys_get_extra_data_lfh(uint16_t* extra_data_lfh_size, fileinfo_t fi, u
 	}
 	*extra_data_lfh_size = 0;
 
-	struct Zip64ExtraField zip64_field;
+	struct zip64_extra_field zip64_field;
 	zip64_field.uncompressedSize = &uncompressed_size;
 	zip64_field.compressedSize = &compressed_size;
 	zip64_field.correspondingHeaderOffset = NULL;
@@ -221,7 +221,7 @@ void* zip_sys_get_extra_data_cfh(
 
 	uintmax_t uncompressed_size = 0;
 	uintmax_t compressed_size = 0;
-	struct Zip64ExtraField zip64_field;
+	struct zip64_extra_field zip64_field;
 	zip64_field.compressedSize = NULL;
 	zip64_field.uncompressedSize = NULL;
 	zip64_field.correspondingHeaderOffset = NULL;
@@ -261,7 +261,7 @@ void* zip_sys_get_extra_data_cfh(
 }
 
 static uint16_t zip_sys_get_zip64_extra_block(
-		uint8_t *zip64_extra_block, struct Zip64ExtraField zip64_field
+		uint8_t *zip64_extra_block, struct zip64_extra_field zip64_field
 ){
 	assert(zip64_extra_block != NULL);
 
@@ -449,7 +449,7 @@ void *zip_sys_get_pre_eocd_data(uint16_t *pre_extra_data_eocd_size, uintmax_t cd
 }
 
 uint32_t zip_sys_process_zip64(
-		const uint8_t *extra_data, uint16_t extra_data_size, struct Zip64ExtraField zip64_field
+		const uint8_t *extra_data, uint16_t extra_data_size, struct zip64_extra_field zip64_field
 ){
 	if (extra_data_size == 0) return 1;
 	if (extra_data == NULL) return 1;
