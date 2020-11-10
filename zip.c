@@ -3,7 +3,7 @@
 uint32_t fill_LFH(
 		struct LocalFileHeader *lfh, 
 		uint16_t generalPurposeBitFlag, uint16_t compressionMethod, uint32_t crc32_value,
-		uint64_amd64_t compressedSize, uint64_amd64_t uncompressedSize,
+		uintmax_t compressedSize, uintmax_t uncompressedSize,
 		uint16_t filenameLength, uint16_t extraFieldLength, fileinfo_t fi
 ){
 	lfh->signature = 0x04034b50;
@@ -31,10 +31,10 @@ uint32_t fill_LFH(
 }
 
 int write_LFH(
-		FILEOS* zipf, uint64_amd64_t cur_record_offset, fileinfo_t fi, 
+		FILEOS* zipf, uintmax_t cur_record_offset, fileinfo_t fi, 
 		uint32_t (*compress_fnc)(FILEOS* file_in, FILEOS* file_out, uint32_t *crc32), uint16_t compress_mode, 
 		uint32_t (*crypt_fnc)(FILEOS* file_in, FILEOS* file_out, uint32_t *crc32), uint16_t crypt_mode,
-		uint64_amd64_t *lfh_size
+		uintmax_t *lfh_size
 ){
 	char archiving_data_filename[MAX_PATH];
 	uint64_amd64_t uncompressed_size = {0, 0};
@@ -164,7 +164,7 @@ uint32_t zip_compress_and_encrypt_data_file(
 	return 0;
 }
 
-int zip_find_next_lfh(FILEOS *zipf, uint64_amd64_t *offset){
+int zip_find_next_lfh(FILEOS *zipf, uintmax_t *offset){
 	zip_fpos_t init_pos;
 	zip_sys_fgetpos(zipf, &init_pos);
 
@@ -228,7 +228,7 @@ int zip_find_next_lfh(FILEOS *zipf, uint64_amd64_t *offset){
 
 void fill_CDFH(
 		struct CentralDirectoryFileHeader* cdfh, struct LocalFileHeader lfh, fileinfo_t fi,
-	   	uint16_t extrad_size, uint64_amd64_t lfh_offset, char *comment
+	   	uint16_t extrad_size, uintmax_t lfh_offset, char *comment
 ){
 	cdfh->signature = 0x02014b50;
 	cdfh->versionMadeBy = zip_sys_get_os_version(fi);
@@ -257,7 +257,7 @@ void fill_CDFH(
 	}
 }
 
-uint32_t write_CDFH(FILEOS *zipf, uint64_amd64_t corresponding_lfh_offset, fileinfo_t fi, char *comment, uint64_amd64_t *cfh_size){
+uint32_t write_CDFH(FILEOS *zipf, uintmax_t corresponding_lfh_offset, fileinfo_t fi, char *comment, uintmax_t *cfh_size){
 	zip_fpos_t init_pos;
 	zip_sys_fgetpos(zipf, &init_pos);
 	zip_amd64_fseek(zipf, corresponding_lfh_offset, SEEK_SET);
@@ -302,7 +302,7 @@ uint32_t write_CDFH(FILEOS *zipf, uint64_amd64_t corresponding_lfh_offset, filei
 	return 0;
 }
 
-uint32_t write_EOCD(FILEOS* zipf, uint64_amd64_t cdfh_offset, uint64_amd64_t cdfh_total, uint64_amd64_t cdfh_size, char* comment){
+uint32_t write_EOCD(FILEOS* zipf, uintmax_t cdfh_offset, uintmax_t cdfh_total, uintmax_t cdfh_size, char* comment){
 	uint16_t extra_data_size;
 	void *pre_eocd_data = zip_sys_get_pre_eocd_data(&extra_data_size, cdfh_offset, cdfh_total, cdfh_size);
 
