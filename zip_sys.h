@@ -86,7 +86,7 @@ struct zip64_end_of_central_directory {
 
 #ifndef _ZIP64_END_OF_CENTRAL_DIRECTORY_LOCATOR_DEFINED
 #define _ZIP64_END_OF_CENTRAL_DIRECTORY_LOCATOR_DEFINED
-struct Zip64EndOfCentralDirectoryLocator {
+struct zip64_end_of_central_directory_locator {
     uint32_t signature;
     uint32_t diskNumber;
     uintmax_t zip64EndOfCentralDirectoryOffset;

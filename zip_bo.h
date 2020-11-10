@@ -83,7 +83,7 @@ struct zip64_end_of_central_directory {
 
 #ifndef _ZIP64_END_OF_CENTRAL_DIRECTORY_LOCATOR_DEFINED
 #define _ZIP64_END_OF_CENTRAL_DIRECTORY_LOCATOR_DEFINED
-struct Zip64EndOfCentralDirectoryLocator {
+struct zip64_end_of_central_directory_locator {
     uint32_t signature;
     uint32_t diskNumber;
     uintmax_t zip64EndOfCentralDirectoryOffset;
@@ -113,7 +113,7 @@ void zip_bo_le_uint64_amd64(uint64_amd64_t *uint64);
 
 void zip_bo_le_zip64_eocd(struct zip64_end_of_central_directory *zip64_eocd);
 
-void zip_bo_le_zip64_eocdl(struct Zip64EndOfCentralDirectoryLocator *zip64_eocdl);
+void zip_bo_le_zip64_eocdl(struct zip64_end_of_central_directory_locator *zip64_eocdl);
 
 uintmax_t zip_bo_reverse_uintmax(uintmax_t uintmax);
 
