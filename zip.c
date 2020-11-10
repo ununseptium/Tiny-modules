@@ -64,7 +64,7 @@ int write_LFH(
 	zip_sys_fgetpos(zipf, &start_record_lfh_pos);
 
 	uintmax_t record_lfh_size = 0;
-	uint64_amd64_plus_uint32(&record_lfh_size, sizeof(struct LocalFileHeader));
+	record_lfh_size += sizeof(struct LocalFileHeader);
 	zip_amd64_fseek(zipf, record_lfh_size, SEEK_CUR);
 
 	uint16_t relative_corresponding_filename_size = strlen(zip_sys_get_relative_filename(fi));
@@ -73,17 +73,17 @@ int write_LFH(
 		zip_sys_fwrite("/", sizeof(char), 1, zipf);
 		relative_corresponding_filename_size++;
 	}
-	uint64_amd64_plus_uint32(&record_lfh_size, relative_corresponding_filename_size);
+	record_lfh_size += relative_corresponding_filename_size;
 
 	uint16_t extra_data_size;
 	void* extra_data = zip_sys_get_extra_data_lfh(&extra_data_size, fi, uncompressed_size, compressed_size);
 	zip_sys_fwrite(extra_data, 1, extra_data_size, zipf);
-	uint64_amd64_plus_uint32(&record_lfh_size, (uint32_t)extra_data_size);
+	record_lfh_size += extra_data_size;
 
 	if (!zip_sys_is_folder(corresponding_filename)){
 		FILEOS *archive_data = zip_sys_fopen(archiving_data_filename, "rb");
 		uintmax_t archive_data_offset = 0;
-		uint64_amd64_plus_uint64_amd64(&cur_record_offset, record_lfh_size);
+		cur_record_offset += record_lfh_size;
 		
 		if (!need_create_tmp_file){
 			zip_amd64_f2f_data_transfer(zipf, cur_record_offset, archive_data, archive_data_offset, compressed_size, &file_crc32);
@@ -94,10 +94,10 @@ int write_LFH(
 			remove(archiving_data_filename);
 		}
 
-		uint64_amd64_plus_uint64_amd64(&record_lfh_size, compressed_size);
+		record_lfh_size += compressed_size;
 	}
 
-	uint64_amd64_assign_uint64_amd64(lfh_size, record_lfh_size);
+	*lfh_size = record_lfh_size;
 
 	zip_fpos_t end_record_lfh_pos;
 	zip_sys_fgetpos(zipf, &end_record_lfh_pos);
@@ -174,27 +174,24 @@ int zip_find_next_lfh(FILEOS *zipf, uintmax_t *offset){
 	if (lfh.signature != 0x04034b50){
 		return 1;
 	}
-	uint64_amd64_plus_uint32(offset, sizeof(struct LocalFileHeader));
+	*offset += sizeof(struct LocalFileHeader);
 
-	uintmax_t filename_len;
-	uint64_amd64_assign_uint32(&filename_len, lfh.filenameLength);
+	uintmax_t filename_len = lfh.filenameLength;
 	zip_amd64_fseek(zipf, filename_len, SEEK_CUR);
-	uint64_amd64_plus_uint64_amd64(offset, filename_len);
+	*offset += filename_len;
 
 	if (lfh.compressedSize != UINT32_MAX){
-		uint64_amd64_assign_uint32(&extra_data_size, lfh.extraFieldLength);
-		uintmax_t extra_data_size;
+		uintmax_t extra_data_size = lfh.extraFieldLength;
 		zip_amd64_fseek(zipf, extra_data_size, SEEK_CUR);
-		uint64_amd64_plus_uint64_amd64(offset, extra_data_size);
+		*offset += extra_data_size;
 
-		uintmax_t filedata_size;
-		uint64_amd64_assign_uint32(&filedata_size, lfh.compressedSize);
+		uintmax_t filedata_size = lfh.compressedSize;
 		zip_amd64_fseek(zipf, filedata_size, SEEK_CUR);
-		uint64_amd64_plus_uint64_amd64(offset, filedata_size);
+		*offset += filedata_size;
 	}else{
 		uint8_t *extra_data = malloc(lfh.extraFieldLength);
 		zip_sys_fread(extra_data, lfh.extraFieldLength, 1, zipf);
-		uint64_amd64_plus_uint32(offset, lfh.extraFieldLength);
+		*offset += lfh.extraFieldLength;
 
 		uintmax_t compressed_size = 0;
 		struct Zip64ExtraField zip64_field;
@@ -209,7 +206,7 @@ int zip_find_next_lfh(FILEOS *zipf, uintmax_t *offset){
 		zip_sys_process_zip64(extra_data, lfh.extraFieldLength, zip64_field);
 		free(extra_data);
 		zip_amd64_fseek(zipf, compressed_size, SEEK_CUR);
-		uint64_amd64_plus_uint64_amd64(offset, compressed_size);
+		*offset += compressed_size;
 	}
 
 	struct LocalFileHeader next_lfh;
@@ -283,20 +280,20 @@ uint32_t write_CDFH(FILEOS *zipf, uintmax_t corresponding_lfh_offset, fileinfo_t
 
 	zip_bo_le_cfh(&cfh);
 	zip_sys_fwrite(&cfh, sizeof(struct CentralDirectoryFileHeader), 1, zipf);
-	uint64_amd64_plus_uint32(&current_cfh_size, sizeof(struct CentralDirectoryFileHeader));
+	current_cfh_size += sizeof(struct CentralDirectoryFileHeader);
 
 	zip_sys_fwrite(filename, 1, cur_lfh.filenameLength, zipf);
-	uint64_amd64_plus_uint32(&current_cfh_size, (uint32_t)cur_lfh.filenameLength);
+	current_cfh_size += cur_lfh.filenameLength;
 
 	zip_sys_fwrite(extra_data, 1, extra_data_size, zipf);
-	uint64_amd64_plus_uint32(&current_cfh_size, extra_data_size);
+	current_cfh_size += extra_data_size;
 
 	uint16_t comment_len = 0;
 	if (comment != NULL) comment_len = strlen(comment);
 	zip_sys_fwrite(comment, 1, comment_len, zipf);
-	uint64_amd64_plus_uint32(&current_cfh_size, comment_len);
+	current_cfh_size += comment_len;
 
-	uint64_amd64_assign_uint64_amd64(cfh_size, current_cfh_size);
+	*cfh_size = current_cfh_size;
 
 	return 0;
 }
@@ -359,11 +356,10 @@ uint32_t zip_pack(
 	uintmax_t cur_lfh;
 	do{
 		write_LFH(archive, ldfh_size, cur_file, NULL, 0, NULL, 0, &cur_lfh);
-		uint64_amd64_plus_uint64_amd64(&ldfh_size, cur_lfh);
+		ldfh_size += cur_lfh;
 	}while(!zip_sys_process_next_file(fi, cur_file));
 
-	uintmax_t relative_lfh_offset;
-	uint64_amd64_assign_uint64_amd64(&relative_lfh_offset, ldfh_offset);
+	uintmax_t relative_lfh_offset = ldfh_offset;
 
 	zip_sys_reset_pathtree_info_pos(fi, cur_file);
 	cur_file = zip_sys_process_first_file(fi);
@@ -372,8 +368,8 @@ uint32_t zip_pack(
 	uintmax_t cur_cfh_size;
 	do{
 		write_CDFH(archive, relative_lfh_offset, cur_file, NULL, &cur_cfh_size);
-		uint64_amd64_plus_uint64_amd64(&cdfh_size, cur_cfh_size);
-		uint64_amd64_plus_uint32(&cdfh_total, 1);
+		cdfh_size += cur_cfh_size;
+		cdfh_total++;
 	}while(!zip_sys_process_next_file(fi, cur_file) && !zip_find_next_lfh(archive, &relative_lfh_offset));
 	zip_sys_close_process(fi, cur_file);
 
