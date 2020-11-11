@@ -108,7 +108,7 @@ uint32_t zip_safe_create_dir(const char *dirname){
 }
 
 FILEOS* zip_safe_fopen(const char *filename, const char *mode){
-	FILEOS* res = zip_safe_fopen(filename, mode);
+	FILEOS* res = zip_sys_fopen(filename, mode);
 	if (res == NULL) abort();
 	return res;
 }
