@@ -97,7 +97,7 @@ void zip_safe_close_process(void* pathtree_info, fileinfo_t fi){
 
 uint16_t zip_safe_get_os_version(fileinfo_t fi){
 	uint16_t res = zip_sys_get_os_version(fi);
-	if (res == NULL) abort();
+	if (res == 0) abort();
 	return res;
 }
 
