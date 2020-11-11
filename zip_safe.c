@@ -16,7 +16,7 @@ const char* zip_safe_get_relative_filename(fileinfo_t fi){
 }
 
 const char* zip_safe_get_absolute_filename(fileinfo_t fi){
-	char* res = zip_sys_get_absolute_filename(fi);
+	const char* res = zip_sys_get_absolute_filename(fi);
 	if (res == NULL) abort();
 	return res;
 }
