@@ -86,6 +86,11 @@ void zip_safe_process_next_file(void* pathtree_info, fileinfo_t fi){
 	if (zip_sys_process_next_file(pathtree_info, fi) == 1) abort();
 }
 
+void zip_safe_reset_pathtree_info_pos(void* pathtree_info, fileinfo_t fi){
+	if (zip_sys_reset_pathtree_info_pos(pathtree_info, fi) != 0)
+		abort();
+}
+
 void zip_safe_close_process(void* pathtree_info, fileinfo_t fi){
 	if (zip_sys_close_process(pathtree_info, fi) != 0) abort();
 }
