@@ -140,7 +140,7 @@ void zip_safe_fseek(FILEOS *stream, intmax_t offset, uint32_t whence){
 	if (res != 0) abort();
 }
 
-uint32_t zip_safe_get_file_size(FILEOS *stream, uintmax_t *size){
+void zip_safe_get_file_size(FILEOS *stream, uintmax_t *size){
 	if (zip_sys_get_file_size(stream, size) != 0) abort();
 }
 
