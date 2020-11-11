@@ -1,5 +1,4 @@
-#include <zip_sys.h>
-#include <stdlib.h>
+#include <zip_safe.h>
 
 uint16_t zip_safe_get_modification_time(fileinfo_t fi){
 	return zip_sys_get_modification_time(fi);
