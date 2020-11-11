@@ -22,18 +22,24 @@ const char* zip_safe_get_absolute_filename(fileinfo_t fi){
 }
 
 void* zip_safe_get_extra_data_lfh(uint16_t* extra_data_size, fileinfo_t fi, uint64_amd64_t uncompressed_size, uint64_amd64_t compressed_size){
-	return zip_sys_get_extra_data_lfh(extra_data_size, fi, uncompressed_size, compressed_size);
+	void* res = zip_sys_get_extra_data_lfh(extra_data_size, fi, uncompressed_size, compressed_size);
+	if (extra_data_size == NULL || (*extra_data_size != 0 && res == NULL)) abort();
+	return res;
 }
 
 void* zip_safe_get_extra_data_cfh(
 		uint16_t* extra_data_size, fileinfo_t fi, uint64_amd64_t lfd_offset,
 		struct LocalFileHeader lfh, void *extra_data_lfh
 ){
-	return zip_sys_get_extra_data_cfh(extra_data_size, fi, lfd_offset, lfh, extra_data_lfh);
+	void* res = zip_sys_get_extra_data_cfh(extra_data_size, fi, lfd_offset, lfh, extra_data_lfh);
+	if (extra_data_size == NULL || (*extra_data_size != 0 && res == NULL)) abort();
+	return res;
 }
 
 void* zip_safe_get_pre_eocd_data(uint16_t *pre_data_size, uint64_amd64_t cdfh_offset, uint64_amd64_t cdfh_total, uint64_amd64_t cdfh_size){
-	return zip_sys_get_pre_eocd_data(pre_data_size, cdfh_offset, cdfh_total, cdfh_size);
+	void* res = zip_sys_get_pre_eocd_data(pre_data_size, cdfh_offset, cdfh_total, cdfh_size);
+	if (pre_data_size == NULL || (*pre_data_size != 0 && res == NULL)) abort();
+	return res;
 }
 
 uint32_t zip_safe_process_zip64(
@@ -53,11 +59,15 @@ uint32_t zip_safe_get_external_attrs(fileinfo_t fi){
 }
 
 uint32_t zip_safe_is_folder(const char* filename){
-	return zip_sys_is_folder(filename);
+	uint32_t res = zip_sys_is_folder(filename);
+	if (res == UINT32_MAX) abort();
+	return res;
 }
 
 uint32_t zip_safe_is_file_exist(const char* filename){
-	return zip_sys_is_file_exist(filename);
+	uint32_t res = zip_sys_is_file_exist(filename);
+	if (res == UINT32_MAX) abort();
+	return res;
 }
 
 void* zip_safe_collect_pathtree_info(const char* path){
@@ -76,8 +86,8 @@ void zip_safe_process_next_file(void* pathtree_info, fileinfo_t fi){
 	if (zip_sys_process_next_file(pathtree_info, fi) == 1) abort();
 }
 
-uint32_t zip_safe_close_process(void* pathtree_info, fileinfo_t fi){
-	return zip_sys_close_process(pathtree_info, fi);
+void zip_safe_close_process(void* pathtree_info, fileinfo_t fi){
+	if (zip_sys_close_process(pathtree_info, fi) != 0) abort();
 }
 
 uint16_t zip_safe_get_os_version(fileinfo_t fi){
@@ -87,7 +97,9 @@ uint16_t zip_safe_get_os_version(fileinfo_t fi){
 }
 
 uint32_t zip_safe_create_dir(const char *dirname){
-	return zip_sys_create_dir(dirname);
+	uint32_t res = zip_sys_create_dir(dirname);
+	if (res == UINT32_MAX) abort();
+	return res;
 }
 
 FILEOS* zip_safe_fopen(const char *filename, const char *mode){
@@ -124,7 +136,7 @@ void zip_safe_fseek(FILEOS *stream, intmax_t offset, uint32_t whence){
 }
 
 uint32_t zip_safe_get_file_size(FILEOS *stream, uintmax_t *size){
-	return zip_sys_get_file_size(stream, size);
+	if (zip_sys_get_file_size(stream, size) != 0) abort();
 }
 
 void* zip_safe_create_mmf(FILEOS *stream, uintmax_t size, uint32_t access_mode){
