@@ -157,7 +157,7 @@ void* zip_safe_map_view(void *mmf, uint32_t access_mode, uintmax_t offset, uintm
 }
 
 void zip_safe_unmap_view(void *map_view, uintmax_t view_size){
-	uint32_t res = zip_safe_unmap_view(map_view, view_size);
+	uint32_t res = zip_sys_unmap_view(map_view, view_size);
 	if (res != 0) abort();
 }
 
