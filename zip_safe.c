@@ -71,7 +71,7 @@ uint32_t zip_safe_is_file_exist(const char* filename){
 }
 
 void* zip_safe_collect_pathtree_info(const char* path){
-	void res = zip_sys_collect_pathtree_info(path);
+	void* res = zip_sys_collect_pathtree_info(path);
 	if (res == NULL) abort();
 	return res;
 }
