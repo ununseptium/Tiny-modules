@@ -145,7 +145,7 @@ uint32_t zip_safe_get_file_size(FILEOS *stream, uintmax_t *size){
 }
 
 void* zip_safe_create_mmf(FILEOS *stream, uintmax_t size, uint32_t access_mode){
-	void* res = zip_sys_create_mmf(stream_out, size, access_mode);
+	void* res = zip_sys_create_mmf(stream, size, access_mode);
 	if (res == NULL) abort();
 	return res;
 }
