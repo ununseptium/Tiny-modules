@@ -82,8 +82,8 @@ fileinfo_t zip_safe_process_first_file(void* pathtree_info){
 	return res;
 }
 
-void zip_safe_process_next_file(void* pathtree_info, fileinfo_t fi){
-	if (zip_sys_process_next_file(pathtree_info, fi) == 1) abort();
+uint32_t zip_safe_process_next_file(void* pathtree_info, fileinfo_t fi){
+	return zip_sys_process_next_file(pathtree_info, fi);
 }
 
 void zip_safe_reset_pathtree_info_pos(void* pathtree_info, fileinfo_t fi){
