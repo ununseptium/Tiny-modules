@@ -46,7 +46,7 @@ uint32_t zip_safe_process_zip64(
 		const uint8_t *extra_data, uint16_t extra_data_size, struct Zip64ExtraField zip64_field
 ){
 	uint32_t res = zip_sys_process_zip64(extra_data, extra_data_size, zip64_field);
-	if (res == 1) abort();
+	if (res != 0) abort();
 	return res;
 }
 
