@@ -43,7 +43,7 @@ void* zip_safe_get_pre_eocd_data(uint16_t *pre_data_size, uint64_amd64_t cdfh_of
 }
 
 uint32_t zip_safe_process_zip64(
-		const uint8_t *extra_data, uint16_t extra_data_size, struct Zip64ExtraField zip64_field
+		const uint8_t *extra_data, uint16_t extra_data_size, struct zip64_extra_field zip64_field
 ){
 	uint32_t res = zip_sys_process_zip64(extra_data, extra_data_size, zip64_field);
 	if (res != 0) abort();
