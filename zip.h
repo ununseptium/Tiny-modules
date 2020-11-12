@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <zip_amd64.h>
 #include <zip_bo.h>
 #include <zip_sys.h>
 
