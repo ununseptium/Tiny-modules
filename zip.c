@@ -344,12 +344,9 @@ uint32_t zip_pack(
 		return 1;
 
 	FILEOS* archive = zip_safe_fopen(archive_name, "wb+");
-	if (archive == NULL)
-		return 1;
 
 	void* fi = zip_safe_collect_pathtree_info(path_to_pack);
-	if (fi == NULL)
-		return 1;
+
 	fileinfo_t cur_file = zip_safe_process_first_file(fi);
 	uintmax_t ldfh_offset = 0;
 	uintmax_t ldfh_size = 0;
