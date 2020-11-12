@@ -9,6 +9,7 @@
 #include <string.h>
 #include <time.h>
 #include <zip_bo.h>
+#include <zip_safe.h>
 #include <zip_sys.h>
 
 #ifndef _LOCAL_FILE_HEADER_DIFENED
