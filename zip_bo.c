@@ -130,6 +130,6 @@ uintmax_t zip_bo_reverse_uintmax(uintmax_t uintmax){
 }
 
 void zip_bo_le_uintmax(uintmax_t *uintmax){
-	if (!zip_bo_is_le() uintmax != NULL)
+	if (!zip_bo_is_le() && uintmax != NULL)
 		*uintmax = zip_bo_reverse_uintmax(*uintmax);
 }
