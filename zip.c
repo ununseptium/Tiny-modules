@@ -46,13 +46,13 @@ int write_LFH(
 	if (!zip_sys_is_folder(corresponding_filename)){
 
 		FILEOS *uncompressed_file = zip_sys_fopen(corresponding_filename, "rb");
-		zip_amd64_get_file_size(uncompressed_file, &uncompressed_size);
+		zip_safe_get_file_size(uncompressed_file, &uncompressed_size);
 		zip_sys_fclose(uncompressed_file);
 
 		if (need_create_tmp_file){
 			zip_compress_and_encrypt_data_file(corresponding_filename, archiving_data_filename, compress_fnc, crypt_fnc, &file_crc32);
 			FILEOS *compressed_file = zip_sys_fopen(archiving_data_filename, "rb");
-			zip_amd64_get_file_size(compressed_file, &compressed_size);
+			zip_safe_get_file_size(compressed_file, &compressed_size);
 			zip_sys_fclose(compressed_file);
 		}else{
 			compressed_size = uncompressed_size;
@@ -65,7 +65,7 @@ int write_LFH(
 
 	uintmax_t record_lfh_size = 0;
 	record_lfh_size += sizeof(struct LocalFileHeader);
-	zip_amd64_fseek(zipf, record_lfh_size, SEEK_CUR);
+	zip_safe_fseek(zipf, record_lfh_size, SEEK_CUR);
 
 	uint16_t relative_corresponding_filename_size = strlen(zip_sys_get_relative_filename(fi));
 	zip_sys_fwrite(zip_sys_get_relative_filename(fi), relative_corresponding_filename_size, 1, zipf);
@@ -86,10 +86,10 @@ int write_LFH(
 		cur_record_offset += record_lfh_size;
 		
 		if (!need_create_tmp_file){
-			zip_amd64_f2f_data_transfer(zipf, cur_record_offset, archive_data, archive_data_offset, compressed_size, &file_crc32);
+			zip_safe_f2f_data_transfer(zipf, cur_record_offset, archive_data, archive_data_offset, compressed_size, &file_crc32);
 			zip_sys_fclose(archive_data);
 		}else{
-			zip_amd64_f2f_data_transfer(zipf, cur_record_offset, archive_data, archive_data_offset, compressed_size, NULL);
+			zip_safe_f2f_data_transfer(zipf, cur_record_offset, archive_data, archive_data_offset, compressed_size, NULL);
 			zip_sys_fclose(archive_data);
 			remove(archiving_data_filename);
 		}
@@ -167,7 +167,7 @@ int zip_find_next_lfh(FILEOS *zipf, uintmax_t *offset){
 	zip_fpos_t init_pos;
 	zip_sys_fgetpos(zipf, &init_pos);
 
-	zip_amd64_fseek(zipf, *offset, SEEK_SET);
+	zip_safe_fseek(zipf, *offset, SEEK_SET);
 	struct LocalFileHeader lfh;
 	zip_sys_fread(&lfh, sizeof(struct LocalFileHeader), 1, zipf);
 	zip_bo_le_lfh(&lfh);
@@ -177,16 +177,16 @@ int zip_find_next_lfh(FILEOS *zipf, uintmax_t *offset){
 	*offset += sizeof(struct LocalFileHeader);
 
 	uintmax_t filename_len = lfh.filenameLength;
-	zip_amd64_fseek(zipf, filename_len, SEEK_CUR);
+	zip_safe_fseek(zipf, filename_len, SEEK_CUR);
 	*offset += filename_len;
 
 	if (lfh.compressedSize != UINT32_MAX){
 		uintmax_t extra_data_size = lfh.extraFieldLength;
-		zip_amd64_fseek(zipf, extra_data_size, SEEK_CUR);
+		zip_safe_fseek(zipf, extra_data_size, SEEK_CUR);
 		*offset += extra_data_size;
 
 		uintmax_t filedata_size = lfh.compressedSize;
-		zip_amd64_fseek(zipf, filedata_size, SEEK_CUR);
+		zip_safe_fseek(zipf, filedata_size, SEEK_CUR);
 		*offset += filedata_size;
 	}else{
 		uint8_t *extra_data = malloc(lfh.extraFieldLength);
@@ -205,7 +205,7 @@ int zip_find_next_lfh(FILEOS *zipf, uintmax_t *offset){
 
 		zip_sys_process_zip64(extra_data, lfh.extraFieldLength, zip64_field);
 		free(extra_data);
-		zip_amd64_fseek(zipf, compressed_size, SEEK_CUR);
+		zip_safe_fseek(zipf, compressed_size, SEEK_CUR);
 		*offset += compressed_size;
 	}
 
@@ -256,7 +256,7 @@ void fill_CDFH(
 uint32_t write_CDFH(FILEOS *zipf, uintmax_t corresponding_lfh_offset, fileinfo_t fi, char *comment, uintmax_t *cfh_size){
 	zip_fpos_t init_pos;
 	zip_sys_fgetpos(zipf, &init_pos);
-	zip_amd64_fseek(zipf, corresponding_lfh_offset, SEEK_SET);
+	zip_safe_fseek(zipf, corresponding_lfh_offset, SEEK_SET);
 
 	struct LocalFileHeader cur_lfh;
 	zip_sys_fread(&cur_lfh, sizeof(struct LocalFileHeader), 1, zipf);
