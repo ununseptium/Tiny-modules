@@ -88,15 +88,15 @@ void zip_bo_le_eocd(struct EOCD *eocd){
 void zip_bo_le_zip64_eocd(struct zip64_end_of_central_directory *zip64_eocd){
 	if (!zip_bo_is_le() && zip64_eocd != NULL){
 		zip64_eocd->signature = zip_bo_reverse_uint32(zip64_eocd->signature);
-		zip_bo_reverse_uint64_amd64(&(zip64_eocd->sizeOfZip64EndOfCentralDirectory));
+		zip_bo_reverse_uintmax(&(zip64_eocd->sizeOfZip64EndOfCentralDirectory));
 		zip64_eocd->versionMadeBy = zip_bo_reverse_uint32(zip64_eocd->versionMadeBy);
 		zip64_eocd->versionToExtract = zip_bo_reverse_uint32(zip64_eocd->versionToExtract);
 		zip64_eocd->diskNumber = zip_bo_reverse_uint32(zip64_eocd->diskNumber);
 		zip64_eocd->startDiskNumber = zip_bo_reverse_uint32(zip64_eocd->startDiskNumber);
-		zip_bo_reverse_uint64_amd64(&(zip64_eocd->numberCentralDirectoryRecord));
-		zip_bo_reverse_uint64_amd64(&(zip64_eocd->totalCentralDirectoryRecord));
-		zip_bo_reverse_uint64_amd64(&(zip64_eocd->sizeOfCentralDirectory));
-		zip_bo_reverse_uint64_amd64(&(zip64_eocd->centralDirectoryOffset));
+		zip_bo_reverse_uintmax(&(zip64_eocd->numberCentralDirectoryRecord));
+		zip_bo_reverse_uintmax(&(zip64_eocd->totalCentralDirectoryRecord));
+		zip_bo_reverse_uintmax(&(zip64_eocd->sizeOfCentralDirectory));
+		zip_bo_reverse_uintmax(&(zip64_eocd->centralDirectoryOffset));
 	}
 }
 
@@ -104,7 +104,7 @@ void zip_bo_le_zip64_eocdl(struct Zip64EndOfCentralDirectoryLocator *zip64_eocdl
 	if (!zip_bo_is_le() && zip64_eocdl != NULL){
 		zip64_eocdl->signature = zip_bo_reverse_uint32(zip64_eocdl->signature);
 		zip64_eocdl->diskNumber = zip_bo_reverse_uint32(zip64_eocdl->diskNumber);
-		zip_bo_reverse_uint64_amd64(&(zip64_eocdl->zip64EndOfCentralDirectoryOffset));
+		zip_bo_reverse_uintmax(&(zip64_eocdl->zip64EndOfCentralDirectoryOffset));
 		zip64_eocdl->totalDisks = zip_bo_reverse_uint32(zip64_eocdl->totalDisks);
 	}
 }
