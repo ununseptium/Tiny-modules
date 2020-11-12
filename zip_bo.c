@@ -100,7 +100,7 @@ void zip_bo_le_zip64_eocd(struct zip64_end_of_central_directory *zip64_eocd){
 	}
 }
 
-void zip_bo_le_zip64_eocdl(struct Zip64EndOfCentralDirectoryLocator *zip64_eocdl){
+void zip_bo_le_zip64_eocdl(struct zip64_end_of_central_directory_locator *zip64_eocdl){
 	if (!zip_bo_is_le() && zip64_eocdl != NULL){
 		zip64_eocdl->signature = zip_bo_reverse_uint32(zip64_eocdl->signature);
 		zip64_eocdl->diskNumber = zip_bo_reverse_uint32(zip64_eocdl->diskNumber);
