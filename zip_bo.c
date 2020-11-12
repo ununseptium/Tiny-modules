@@ -104,7 +104,7 @@ void zip_bo_le_zip64_eocdl(struct Zip64EndOfCentralDirectoryLocator *zip64_eocdl
 	if (!zip_bo_is_le() && zip64_eocdl != NULL){
 		zip64_eocdl->signature = zip_bo_reverse_uint32(zip64_eocdl->signature);
 		zip64_eocdl->diskNumber = zip_bo_reverse_uint32(zip64_eocdl->diskNumber);
-		zip_bo_reverse_uintmax(&(zip64_eocdl->zip64EndOfCentralDirectoryOffset));
+		zip_bo_reverse_uintmax(zip64_eocdl->zip64EndOfCentralDirectoryOffset);
 		zip64_eocdl->totalDisks = zip_bo_reverse_uint32(zip64_eocdl->totalDisks);
 	}
 }
