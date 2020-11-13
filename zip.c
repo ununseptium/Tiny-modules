@@ -86,7 +86,8 @@ int write_LFH(
 		cur_record_offset += record_lfh_size;
 		
 		if (!need_create_tmp_file){
-			zip_safe_f2f_data_transfer(zipf, cur_record_offset, archive_data, archive_data_offset, compressed_size, &file_crc32);
+			if (uncompressed_size != 0)
+				zip_safe_f2f_data_transfer(zipf, cur_record_offset, archive_data, archive_data_offset, compressed_size, &file_crc32);
 			zip_safe_fclose(archive_data);
 		}else{
 			zip_safe_f2f_data_transfer(zipf, cur_record_offset, archive_data, archive_data_offset, compressed_size, NULL);
