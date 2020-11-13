@@ -848,6 +848,7 @@ uint32_t zip_sys_fgetpos(FILEOS *stream, zip_fpos_t *pos){
 			*pos |= (zip_fpos_t)pos_high_half << 32; 
 		}
 		*pos |= pos_low_half;
+		return 0;
 	#endif
 
 	return 1;
