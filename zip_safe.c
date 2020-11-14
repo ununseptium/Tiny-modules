@@ -1,5 +1,11 @@
 #include <zip_safe.h>
 
+static FILEOS* global_streams[MAX_STREAMS] = {
+		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+};
 uint16_t zip_safe_get_modification_time(fileinfo_t fi){
 	return zip_sys_get_modification_time(fi);
 }
