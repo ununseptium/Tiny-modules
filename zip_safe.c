@@ -24,6 +24,20 @@ static uint32_t zip_safe_replace_stream(FILEOS* str1, FILEOS* str2){
 	return 1;
 }
 
+static void zip_safe_collect_garbage(){
+	for (uint32_t stream_index = 0; stream_index < MAX_STREAMS; stream_index++){
+		if (global_streams[stream_index] != NULL){
+			zip_sys_fclose(global_streams[stream_index]);
+		}
+	}
+
+	for (uint32_t path_index = 0; path_index < MAX_STREAMS; path_index++){
+		if (garbage_files[path_index] != NULL){
+			remove(garbage_files[path_index]);
+		}
+	}
+}
+
 void zip_safe_add_file_to_delete(char* file_path){
 	if (strlen(file_path) >= MAX_PATH){
 		for (uint32_t path_index = 0; path_index > MAX_STREAMS; path_index++){
