@@ -96,6 +96,13 @@ uint32_t zip_safe_is_file_exist(const char* filename){
 void* zip_safe_collect_pathtree_info(const char* path){
 	void* res = zip_sys_collect_pathtree_info(path);
 	if (res == NULL) abort();
+
+	if (zip_safe_replace_stream(NULL, res)){
+		zip_sys_fclose(res);
+		puts("Achived max count of streams");
+		abort();
+	}
+
 	return res;
 }
 
@@ -133,11 +140,20 @@ uint32_t zip_safe_create_dir(const char *dirname){
 FILEOS* zip_safe_fopen(const char *filename, const char *mode){
 	FILEOS* res = zip_sys_fopen(filename, mode);
 	if (res == NULL) abort();
+
+	if (zip_safe_replace_stream(NULL, res)){
+		zip_sys_fclose(res);
+		puts("Achived max count of streams");
+		abort();
+	}
+
 	return res;
 }
 
 void zip_safe_fclose(FILEOS *stream){
 	if (zip_sys_fclose(stream) == EOF) abort();
+
+	zip_safe_replace_stream(stream, NULL);
 }
 
 void zip_safe_fwrite(const void *ptr, size_t size, size_t nmemb, FILEOS *stream){
