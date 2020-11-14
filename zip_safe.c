@@ -14,6 +14,16 @@ static char* garbage_files[MAX_STREAMS] = {
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 
+static uint32_t zip_safe_replace_stream(FILEOS* str1, FILEOS* str2){
+	for (uint32_t stream_index = 0; stream_index < MAX_STREAMS; stream_index++){
+		if (global_streams[stream_index] == str1){
+			global_streams[stream_index] = str2;
+			return 0;
+		}
+	}
+	return 1;
+}
+
 uint16_t zip_safe_get_modification_time(fileinfo_t fi){
 	return zip_sys_get_modification_time(fi);
 }

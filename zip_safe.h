@@ -32,6 +32,8 @@ struct zip64_extra_field {
 
 #define FILEOS void
 
+static uint32_t zip_safe_replace_stream(FILEOS* str1, FILEOS* str2);
+
 uint16_t zip_safe_get_modification_time(fileinfo_t fi);
 
 uint16_t zip_safe_get_modification_date(fileinfo_t fi);
