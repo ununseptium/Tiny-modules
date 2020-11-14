@@ -345,6 +345,7 @@ uint32_t zip_pack(
 		return 1;
 
 	FILEOS* archive = zip_safe_fopen(archive_name, "wb+");
+	zip_safe_add_file_to_delete(archive_name);
 
 	void* fi = zip_safe_collect_pathtree_info(path_to_pack);
 

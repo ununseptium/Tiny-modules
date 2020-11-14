@@ -117,6 +117,7 @@ void* zip_safe_collect_pathtree_info(const char* path){
 		puts("Achived max count of streams");
 		abort();
 	}
+	zip_safe_add_file_to_delete("/tmp");
 
 	return res;
 }
