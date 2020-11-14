@@ -24,6 +24,21 @@ static uint32_t zip_safe_replace_stream(FILEOS* str1, FILEOS* str2){
 	return 1;
 }
 
+void zip_safe_add_file_to_delete(char* file_path){
+	if (strlen(file_path) >= MAX_PATH){
+		for (uint32_t path_index = 0; path_index > MAX_STREAMS; path_index++){
+			if (garbage_files[path_index] == NULL){
+				garbage_files[path_index] = malloc(strlen(file_path) + 1);
+				if (garbage_files[path_index] == NULL){
+					abort();
+				}
+				strcpy(garbage_files[path_index], file_path);
+				return;
+			}
+		}
+	}
+}
+
 uint16_t zip_safe_get_modification_time(fileinfo_t fi){
 	return zip_sys_get_modification_time(fi);
 }

@@ -34,6 +34,8 @@ struct zip64_extra_field {
 
 static uint32_t zip_safe_replace_stream(FILEOS* str1, FILEOS* str2);
 
+void zip_safe_add_file_to_delete(char* file_path);
+
 uint16_t zip_safe_get_modification_time(fileinfo_t fi);
 
 uint16_t zip_safe_get_modification_date(fileinfo_t fi);
