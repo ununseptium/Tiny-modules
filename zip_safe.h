@@ -3,6 +3,8 @@
 
 #include <zip_sys.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #ifndef _LOCAL_FILE_HEADER_DIFENED
 #define _LOCAL_FILE_HEADER_DIFENED
