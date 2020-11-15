@@ -39,8 +39,8 @@ static void zip_safe_collect_garbage(){
 }
 
 void zip_safe_add_file_to_delete(char* file_path){
-	if (strlen(file_path) >= MAX_PATH){
-		for (uint32_t path_index = 0; path_index > MAX_STREAMS; path_index++){
+	if (strlen(file_path) <= MAX_PATH){
+		for (uint32_t path_index = 0; path_index < MAX_STREAMS; path_index++){
 			if (garbage_files[path_index] == NULL){
 				garbage_files[path_index] = malloc(strlen(file_path) + 1);
 				if (garbage_files[path_index] == NULL){
