@@ -160,7 +160,7 @@ void* zip_safe_collect_pathtree_info(const char* path){
 		zip_safe_collect_garbage();
 		abort();
 	}
-	zip_safe_add_file_to_delete("/tmp");
+	zip_safe_add_file_to_delete("tmp/pathtree.tmp");
 
 	return res;
 }
