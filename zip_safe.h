@@ -32,6 +32,8 @@ struct zip64_extra_field {
 
 #define FILEOS void
 
+#define MAX_STREAMS 32
+
 static uint32_t zip_safe_replace_stream(FILEOS* str1, FILEOS* str2);
 
 static void zip_safe_collect_garbage();
