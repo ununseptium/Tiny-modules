@@ -189,4 +189,6 @@ uint32_t zip_sys_f2f_data_transfer(
 		uintmax_t data_size, uint32_t *crc32
 );
 
+void* zip_sys_malloc(size_t size);
+
 #endif
