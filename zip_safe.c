@@ -325,3 +325,12 @@ void zip_safe_f2f_data_transfer(
 		abort();
 	}
 }
+
+void* zip_safe_malloc(size_t size){
+	void* res = zip_sys_malloc(size);
+	if (res == NULL) {
+		zip_safe_collect_garbage();
+		abort();
+	}
+	return res;
+}

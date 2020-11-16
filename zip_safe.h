@@ -115,4 +115,6 @@ void zip_safe_f2f_data_transfer(
 		uintmax_t data_size, uint32_t *crc32
 );
 
+void* zip_safe_malloc(size_t size);
+
 #endif
