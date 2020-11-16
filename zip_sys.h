@@ -191,4 +191,6 @@ uint32_t zip_sys_f2f_data_transfer(
 
 void* zip_sys_malloc(size_t size);
 
+void zip_sys_free(void* ptr);
+
 #endif
