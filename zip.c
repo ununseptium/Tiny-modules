@@ -190,7 +190,7 @@ int zip_find_next_lfh(FILEOS *zipf, uintmax_t *offset){
 		zip_safe_fseek(zipf, filedata_size, SEEK_CUR);
 		*offset += filedata_size;
 	}else{
-		uint8_t *extra_data = malloc(lfh.extraFieldLength);
+		uint8_t *extra_data = zip_safe_malloc(lfh.extraFieldLength);
 		zip_safe_fread(extra_data, lfh.extraFieldLength, 1, zipf);
 		*offset += lfh.extraFieldLength;
 
@@ -205,7 +205,7 @@ int zip_find_next_lfh(FILEOS *zipf, uintmax_t *offset){
 			zip64_field.uncompressedSize = &uncompressed_size;
 
 		zip_safe_process_zip64(extra_data, lfh.extraFieldLength, zip64_field);
-		free(extra_data);
+		zip_safe_free(extra_data);
 		zip_safe_fseek(zipf, compressed_size, SEEK_CUR);
 		*offset += compressed_size;
 	}
@@ -268,7 +268,7 @@ uint32_t write_CDFH(FILEOS *zipf, uintmax_t corresponding_lfh_offset, fileinfo_t
 	char filename[cur_lfh.filenameLength];
 	zip_safe_fread(filename, sizeof(char), cur_lfh.filenameLength, zipf);
 
-	void *extra_data_lfh = malloc(cur_lfh.extraFieldLength);
+	void *extra_data_lfh = zip_safe_malloc(cur_lfh.extraFieldLength);
 	zip_safe_fread(extra_data_lfh, cur_lfh.extraFieldLength, 1, zipf);
 	uint16_t extra_data_size;
 	void *extra_data = zip_safe_get_extra_data_cfh(&extra_data_size, fi, corresponding_lfh_offset, cur_lfh, extra_data_lfh);
