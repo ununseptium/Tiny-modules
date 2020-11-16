@@ -78,6 +78,7 @@ int write_LFH(
 	uint16_t extra_data_size;
 	void* extra_data = zip_safe_get_extra_data_lfh(&extra_data_size, fi, uncompressed_size, compressed_size);
 	zip_safe_fwrite(extra_data, 1, extra_data_size, zipf);
+	zip_safe_free(extra_data);
 	record_lfh_size += extra_data_size;
 
 	if (!zip_safe_is_folder(corresponding_filename)){
@@ -272,6 +273,7 @@ uint32_t write_CDFH(FILEOS *zipf, uintmax_t corresponding_lfh_offset, fileinfo_t
 	zip_safe_fread(extra_data_lfh, cur_lfh.extraFieldLength, 1, zipf);
 	uint16_t extra_data_size;
 	void *extra_data = zip_safe_get_extra_data_cfh(&extra_data_size, fi, corresponding_lfh_offset, cur_lfh, extra_data_lfh);
+	zip_safe_free(extra_data_lfh);
 
 	struct CentralDirectoryFileHeader cfh;
 	fill_CDFH(&cfh, cur_lfh, fi, extra_data_size, corresponding_lfh_offset, comment);
@@ -287,6 +289,7 @@ uint32_t write_CDFH(FILEOS *zipf, uintmax_t corresponding_lfh_offset, fileinfo_t
 	current_cfh_size += cur_lfh.filenameLength;
 
 	zip_safe_fwrite(extra_data, 1, extra_data_size, zipf);
+	zip_safe_free(extra_data);
 	current_cfh_size += extra_data_size;
 
 	uint16_t comment_len = 0;
@@ -304,6 +307,7 @@ uint32_t write_EOCD(FILEOS* zipf, uintmax_t cdfh_offset, uintmax_t cdfh_total, u
 	void *pre_eocd_data = zip_safe_get_pre_eocd_data(&extra_data_size, cdfh_offset, cdfh_total, cdfh_size);
 
 	zip_safe_fwrite(pre_eocd_data, 1, extra_data_size, zipf);
+	zip_safe_free(pre_eocd_data);
 
 	struct EOCD eocd;
 	eocd.signature = 0x06054b50;
