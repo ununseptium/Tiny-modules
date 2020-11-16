@@ -117,4 +117,6 @@ void zip_safe_f2f_data_transfer(
 
 void* zip_safe_malloc(size_t size);
 
+void zip_safe_free(void* ptr);
+
 #endif

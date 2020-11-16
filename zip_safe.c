@@ -334,3 +334,7 @@ void* zip_safe_malloc(size_t size){
 	}
 	return res;
 }
+
+void zip_safe_free(void* ptr){
+	zip_sys_free(ptr);
+}
