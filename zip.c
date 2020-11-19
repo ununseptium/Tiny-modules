@@ -381,3 +381,30 @@ uint32_t zip_pack(
 	zip_safe_fclose(archive);
 	return 0;
 }
+
+uint32_t zip_unpack(char* path_to_archive, char* path_to_unpack){
+	if (path_to_archive == NULL || path_to_unpack == NULL) return 1;
+	uint32_t archive_is_exist = zip_safe_is_file_exist(path_to_archive) && !zip_safe_is_folder(path_to_archive);
+	if (!archive_is_exist) return 1;
+
+	uint32_t unpack_path_is_exist = zip_safe_is_file_exist(path_to_archive) && zip_safe_is_folder(path_to_archive);
+	if (!unpack_path_is_exist) return 1;
+
+	FILEOS* archive = zip_safe_fopen(path_to_archive, "rb");
+	uintmax_t files_count;
+	if (zip_get_files_count(archive, &files_count) != 0) return 1;
+
+	zip_fpos_t central_directory_pos;
+	if (zip_get_central_directory_start(archive, &central_directory_pos) != 0) return 1;
+
+	zip_fpos_t local_directory_pos;
+	for (uintmax_t file_index = 0; file_index < files_count; file_index++){
+		FILEOS* cur_file = zip_create_file(path_to_unpack, &central_directory_pos, &local_directory_pos);
+		if (cur_file == NULL) return 1;
+
+		if (zip_write_file(cur_file, local_directory_pos) != 0) return 1;
+		zip_safe_fclose(cur_file);
+	}
+
+	return 0;
+}

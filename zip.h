@@ -116,4 +116,6 @@ uint32_t zip_pack(
 		char* comment
 );
 
+uint32_t zip_unpack(char* path_to_archive, char* path_to_unpack);
+
 #endif
