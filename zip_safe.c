@@ -338,3 +338,10 @@ void* zip_safe_malloc(size_t size){
 void zip_safe_free(void* ptr){
 	zip_sys_free(ptr);
 }
+
+void zip_safe_get_cdfh_count(FILEOS* archive, uintmax_t* count){
+	if (zip_sys_get_cdfh_count(archive, count) != 0){
+		zip_safe_collect_garbage();
+		abort();
+	}
+}
