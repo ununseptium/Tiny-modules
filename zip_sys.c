@@ -1126,3 +1126,56 @@ uint32_t zip_sys_get_cdfh_count(FILEOS* archive, uintmax_t* count){
 	*count = zip64_eocd.totalCentralDirectoryRecord;
 	return 0;
 }
+
+uint32_t zip_sys_get_cdfh_offset(FILEOS* archive, uintmax_t* offset){
+	if (archive == NULL || offset == NULL) return 1;
+
+	if (zip_sys_fseek(archive, -sizeof(uint32_t), SEEK_END) != 0) return 1;
+	uint32_t signature;
+	do{
+		if (zip_sys_fread(&signature, sizeof(uint32_t), 1, archive) != 1) return 1;
+		zip_bo_le_uint32(&signature);
+		if (zip_sys_fseek(archive, -sizeof(uint32_t) * 2, SEEK_CUR) != 0) return 1;
+	}while(signature != 0x06054b50);
+	if (zip_sys_fseek(archive, -sizeof(uint32_t), SEEK_CUR) != 0) return 1;
+
+	struct EOCD eocd;
+	if (zip_sys_fread(&eocd, sizeof(struct EOCD), 1, archive) != 1) return 1;
+	zip_bo_le_eocd(&eocd);
+
+	if (eocd.centralDirectoryOffset != UINT32_MAX){
+		*offset = eocd.totalCentralDirectoryRecord;
+		return 0;
+	}
+
+	if (zip_sys_fseek(archive, -sizeof(struct EOCD), SEEK_CUR) != 0) return 1;
+	if (
+			zip_sys_fseek(
+					archive, -sizeof(struct zip64_end_of_central_directory_locator), SEEK_CUR
+			) != 0
+	) return 1;
+
+	struct zip64_end_of_central_directory_locator zip64_eocdl;
+	if (
+			zip_sys_fread(
+					&zip64_eocdl, sizeof(struct zip64_end_of_central_directory_locator), 1, archive
+			) != 1
+	) return 1;
+	zip_bo_le_zip64_eocdl(&zip64_eocdl);
+	if (zip64_eocdl.signature != 0x07064b50) return 1;
+
+	if (zip_sys_fseek(archive, zip64_eocdl.zip64EndOfCentralDirectoryOffset, SEEK_SET) != 0)
+		return 1;
+
+	struct zip64_end_of_central_directory zip64_eocd;
+	if (
+			zip_sys_fread(
+					&zip64_eocd, sizeof(struct zip64_end_of_central_directory), 1, archive
+			) != 1
+	) return 1;
+	zip_bo_le_zip64_eocd(&zip64_eocd);
+	if (zip64_eocd.signature != 0x06064b50) return 1;
+
+	*offset = zip64_eocd.centralDirectoryOffset;
+	return 0;
+}

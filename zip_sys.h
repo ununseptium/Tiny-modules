@@ -195,4 +195,6 @@ void zip_sys_free(void* ptr);
 
 uint32_t zip_sys_get_cdfh_count(FILEOS* archive, uintmax_t* count);
 
+uint32_t zip_sys_get_cdfh_offset(FILEOS* archive, uintmax_t* offset);
+
 #endif
