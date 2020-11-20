@@ -59,6 +59,20 @@ struct LocalFileHeader{
 }__attribute__((packed));
 #endif
 
+#ifndef _EOCD_DEFINED
+#define _EOCD_DEFINED
+struct EOCD {
+	uint32_t signature;
+	uint16_t diskNumber;
+	uint16_t startDiskNumber;
+	uint16_t numberCentralDirectoryRecord;
+	uint16_t totalCentralDirectoryRecord;
+	uint32_t sizeOfCentralDirectory;
+	uint32_t centralDirectoryOffset;
+	uint16_t commentLength;
+}__attribute__((packed));
+#endif
+
 #ifndef _ZIP64_EXTRA_FIELD_DEFINED
 #define _ZIP64_EXTRA_FIELD_DEFINED
 struct zip64_extra_field {
