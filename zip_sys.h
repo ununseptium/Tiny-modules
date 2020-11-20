@@ -193,4 +193,6 @@ void* zip_sys_malloc(size_t size);
 
 void zip_sys_free(void* ptr);
 
+uint32_t zip_sys_get_cdfh_count(FILEOS* archive, uintmax_t* count);
+
 #endif
