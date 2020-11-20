@@ -345,3 +345,10 @@ void zip_safe_get_cdfh_count(FILEOS* archive, uintmax_t* count){
 		abort();
 	}
 }
+
+void zip_safe_get_cdfh_offset(FILEOS* archive, uintmax_t* offset){
+	if (zip_sys_get_cdfh_offset(archive, offset) != 0){
+		zip_safe_collect_garbage();
+		abort();
+	}
+}

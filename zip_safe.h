@@ -121,4 +121,6 @@ void zip_safe_free(void* ptr);
 
 void zip_safe_get_cdfh_count(FILEOS* archive, uintmax_t* count);
 
+void zip_safe_get_cdfh_offset(FILEOS* archive, uintmax_t* offset);
+
 #endif
