@@ -352,3 +352,12 @@ void zip_safe_get_cdfh_offset(FILEOS* archive, uintmax_t* offset){
 		abort();
 	}
 }
+
+uint32_t zip_safe_write_file(FILEOS* archive, uintmax_t cdfh_offset, char* file_path){
+	uint32_t res = zip_sys_write_file(archive, cdfh_offset, file_path);
+	if (res == 1){
+		zip_safe_collect_garbage();
+		abort();
+	}
+	return res;
+}

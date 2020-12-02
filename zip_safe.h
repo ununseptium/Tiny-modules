@@ -123,4 +123,6 @@ void zip_safe_get_cdfh_count(FILEOS* archive, uintmax_t* count);
 
 void zip_safe_get_cdfh_offset(FILEOS* archive, uintmax_t* offset);
 
+uint32_t zip_safe_write_file(FILEOS* archive, uintmax_t cdfh_offset, char* file_path);
+
 #endif
