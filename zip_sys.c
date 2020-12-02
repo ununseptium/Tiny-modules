@@ -1275,3 +1275,24 @@ uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* 
 
 	return 0;
 }
+
+static uint8_t* zip_sys_find_tag_pos(const void* extra_data, uint16_t extra_data_size, uint16_t tag){
+	if (extra_data == NULL) return NULL;
+
+	uint16_t cur_tag;
+	uint16_t cur_block_size;
+	uint8_t offset = 0;
+	while (1){
+		if (offset >= extra_data_size) return NULL;
+
+		cur_tag = ((uint8_t*)extra_data)[offset];
+		zip_bo_le_uint16(&cur_tag);
+		if (cur_tag == tag) break;
+
+		cur_block_size = ((uint8_t*)extra_data)[offset + sizeof(uint16_t)];
+		zip_bo_le_uint16(&cur_block_size);
+		offset += sizeof(uint16_t) + sizeof(uint16_t) + cur_block_size;
+	}
+
+	return (uint8_t*)extra_data + offset;
+}
