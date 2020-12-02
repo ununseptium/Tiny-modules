@@ -1296,3 +1296,96 @@ static uint8_t* zip_sys_find_tag_pos(const void* extra_data, uint16_t extra_data
 
 	return (uint8_t*)extra_data + offset;
 }
+
+uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const char* file_path){
+	if (archive == NULL || file_path == NULL) return 1;
+	if (zip_sys_fseek(archive, cdfh_offset, SEEK_SET) != 0) return 1;
+	struct CentralDirectoryFileHeader cdfh;
+	if (zip_sys_fread(&cdfh, sizeof(struct CentralDirectoryFileHeader), 1, archive) != 1) return 1;
+	zip_bo_le_cfh(&cdfh);
+	if (cdfh.signature != 0x02014b50) return 1;
+
+	#ifdef __WIN32__
+		// representation of 0b00110111
+		uint16_t win_mask_attrs = 1 + 2 + 4 + 16 + 32;
+		uint32_t attributes;
+		if (cdfh.versionMadeBy == WINDOWS_OS_VER)
+			attributes = cdfh.internalFileAttributes;
+		else
+			attributes = cdfh.internalFileAttributes & win_mask_attrs;
+		
+		if (SetFileAttributesA(file_path, attributes) == 0) return 1;
+
+		void* win_extra_data = NULL;
+		if (cdfh.extraFieldLength != 0){
+			win_extra_data = malloc(cdfh.extraFieldLength);
+			if (win_extra_data == NULL) return 1;
+			if (zip_sys_fseek(archive, cdfh.filenameLength, SEEK_CUR) != 0) return 1;
+			if (zip_sys_fread(win_extra_data, cdfh.extraFieldLength, 1, archive) != 1) return 1;
+		}
+
+		uint8_t* block_pos = zip_sys_find_tag_pos(win_extra_data, cdfh.extraFieldLength, 0xa);
+		if (cdfh.versionMadeBy != WINDOWS_OS_VER || block_pos == NULL){
+			FILETIME filetime;
+			if (DosDateTimeToFileTime(cdfh.modificationDate, cdfh.modificationTime, &filetime) == 0) return 1;
+
+			FILEOS* file = zip_sys_fopen(file_path, "r");
+			if (file == NULL) return 1;
+
+			if (SetFileTime(file, NULL, NULL, &filetime) == 0){
+				zip_sys_fclose(file);
+				return 1;
+			}
+
+			zip_sys_fclose(file);
+			return 0;
+		} else{
+			uint16_t block_tag;
+			memcpy(block_pos, &block_tag, sizeof(uint16_t));
+			zip_bo_le_uint16(&block_tag);
+			assert(block_tag == 0xa);
+
+			uint16_t block_size;
+			memcpy(block_pos + 2, &block_size, sizeof(uint16_t));
+			zip_bo_le_uint16(&block_size);
+			assert(block_size == NTFS_SIZE);
+
+			uint16_t ntfs_tag;
+			memcpy(block_pos + 8, &ntfs_tag, sizeof(uint16_t));
+			zip_bo_le_uint16(&ntfs_tag);
+			assert(ntfs_tag == 1);
+
+			uint16_t ntfs_size;
+			memcpy(block_pos + 10, &ntfs_size, sizeof(uint16_t));
+			zip_bo_le_uint16(&ntfs_size);
+			assert(ntfs_size == sizeof(FILETIME) * 3);
+
+			FILETIME mtime;
+			memcpy(block_pos + 12, &mtime, sizeof(FILETIME));
+			zip_bo_le_uint32((uint32_t*)&(mtime.dwLowDateTime));
+			zip_bo_le_uint32((uint32_t*)&(mtime.dwHighDateTime));
+
+			FILETIME atime;
+			memcpy(block_pos + 20, &atime, sizeof(FILETIME));
+			zip_bo_le_uint32((uint32_t*)&(atime.dwLowDateTime));
+			zip_bo_le_uint32((uint32_t*)&(atime.dwHighDateTime));
+
+			FILETIME ctime;
+			memcpy(&ctime, block_pos + 28, sizeof(FILETIME));
+			zip_bo_le_uint32((uint32_t*)&(atime.dwLowDateTime));
+			zip_bo_le_uint32((uint32_t*)&(atime.dwHighDateTime));
+
+			FILEOS* file = zip_sys_fopen(file_path, "r");
+			if (file == NULL) return 1;
+			if (SetFileTime(file, &ctime, &atime, &mtime) == 0){
+				zip_sys_fclose(file);
+				return 1;
+			}
+
+			zip_sys_fclose(file);
+			return 0;
+		}
+	#endif
+
+	return 1;
+}

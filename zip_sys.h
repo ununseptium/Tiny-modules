@@ -215,4 +215,6 @@ uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* 
 
 static uint8_t* zip_sys_find_tag_pos(const void* extra_data, uint16_t extra_data_size, uint16_t tag);
 
+uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const char* file_path);
+
 #endif
