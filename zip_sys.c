@@ -1179,3 +1179,99 @@ uint32_t zip_sys_get_cdfh_offset(FILEOS* archive, uintmax_t* offset){
 	*offset = zip64_eocd.centralDirectoryOffset;
 	return 0;
 }
+
+uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* file_path){
+	if (archive == NULL || file_path == NULL) return 1;
+	uint32_t file_exists = zip_sys_is_file_exist(file_path);
+	if (file_exists == UINT32_MAX) return 1;
+	if (file_exists) return 2;
+
+	if (file_path[strlen(file_path) - 1] == '/'){
+		char dir_filename[strlen(file_path)];
+		strncpy(dir_filename, file_path, strlen(file_path) - 1);
+		if (zip_sys_create_dir(dir_filename) != UINT32_MAX) return 1;
+		return 0;
+	}
+
+	if (zip_sys_fseek(archive, cdfh_offset, SEEK_SET) != 0) return 1;
+	struct CentralDirectoryFileHeader cdfh;
+	if (zip_sys_fread(&cdfh, sizeof(struct CentralDirectoryFileHeader), 1, archive) != 1)
+		return 1;
+	zip_bo_le_cfh(&cdfh);
+	if (cdfh.signature != 0x02014b50) return 1;
+
+	if (cdfh.uncompressedSize == 0){
+		FILEOS* file = (file_path, "w");
+		if (file == NULL) return 1;
+		zip_sys_fclose(file);
+		return 0;
+	}
+
+	if (cdfh.generalPurposeBitFlag != 0) return 3;
+	if (cdfh.compressionMethod != 0) return 3;
+
+	uintmax_t lfh_offset;
+	uintmax_t compressed_size;
+	if (cdfh.localFileHeaderOffset != UINT32_MAX && cdfh.compressedSize){
+		lfh_offset = cdfh.localFileHeaderOffset;
+		compressed_size = cdfh.compressedSize;
+	}
+	else{
+		struct zip64_extra_field zip64_field;
+		if (cdfh.localFileHeaderOffset == UINT32_MAX)
+			zip64_field.correspondingHeaderOffset = &lfh_offset;
+		uintmax_t uncompressed_size;
+		if (cdfh.uncompressedSize == UINT32_MAX)
+			zip64_field.uncompressedSize = &uncompressed_size;
+		if (cdfh.compressedSize == UINT32_MAX)
+			zip64_field.compressedSize = &compressed_size;
+
+		void* extra_data = malloc(cdfh.extraFieldLength);
+		if (extra_data == NULL) return 1;
+		if (zip_sys_fseek(archive, cdfh.filenameLength, SEEK_CUR) != 0){
+			free(extra_data);
+			return 1;
+		}
+		if (zip_sys_fread(extra_data, cdfh.extraFieldLength, 1, archive) != 1){
+			free(extra_data);
+			return 1;
+		}
+
+		if (zip_sys_process_zip64(extra_data, cdfh.extraFieldLength, zip64_field) != 0){
+			free(extra_data);
+			return 1;
+		}
+
+		free(extra_data);
+	}
+
+	if (zip_sys_fseek(archive, lfh_offset, SEEK_SET) != 0) return 1;
+	struct LocalFileHeader lfh;
+	if (zip_sys_fread(&lfh, sizeof(struct LocalFileHeader), 1, archive) != 1) return 1;
+	zip_bo_le_lfh(&lfh);
+	if (lfh.signature != 0x04034b50) return 1;
+
+	uintmax_t archive_data_offset = lfh_offset + lfh.filenameLength + lfh.extraFieldLength;
+
+	FILEOS* file = zip_sys_fopen(file_path, "wb");
+	if (file == NULL) return 1;
+
+	uint32_t crc32_result;
+	if (
+				zip_sys_f2f_data_transfer(
+						archive, archive_data_offset, file, 0, compressed_size, &crc32_result
+				) != 0
+	){
+		zip_sys_fclose(file);
+		remove(file_path);
+		return 1;
+	}
+
+	if (lfh.crc32 != crc32_result){
+		zip_sys_fclose(file);
+		remove(file_path);
+		return 4;
+	}
+
+	return 0;
+}
