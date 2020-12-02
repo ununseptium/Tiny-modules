@@ -125,4 +125,6 @@ void zip_safe_get_cdfh_offset(FILEOS* archive, uintmax_t* offset);
 
 uint32_t zip_safe_write_file(FILEOS* archive, uintmax_t cdfh_offset, char* file_path);
 
+void zip_safe_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const char* file_path);
+
 #endif

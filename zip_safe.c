@@ -361,3 +361,11 @@ uint32_t zip_safe_write_file(FILEOS* archive, uintmax_t cdfh_offset, char* file_
 	}
 	return res;
 }
+
+void zip_safe_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const char* file_path){
+	uint32_t res = zip_sys_set_metadata(archive, cdfh_offset, file_path);
+	if (res != 0){
+		zip_safe_collect_garbage();
+		abort();
+	}
+}
