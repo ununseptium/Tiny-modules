@@ -353,6 +353,29 @@ char* zip_get_filename_from_cdhf(FILEOS* archive, uintmax_t cdfh_offset){
 	return filename;
 }
 
+uint32_t zip_find_next_cdfh(FILEOS* archive, uintmax_t cur_cdfh_offset, uintmax_t *next_cdfh_offset){
+	if (archive == NULL) return 1;
+
+	zip_safe_fseek(archive, cur_cdfh_offset, SEEK_SET);
+	struct CentralDirectoryFileHeader cur_cdfh;
+	zip_safe_fread(&cur_cdfh, sizeof(struct CentralDirectoryFileHeader), 1, archive);
+	zip_bo_le_cfh(&cur_cdfh);
+	if (cur_cdfh.signature != 0x02014b50) return 1;
+
+	zip_safe_fseek(archive, cur_cdfh.filenameLength + cur_cdfh.extraFieldLength + cur_cdfh.fileCommentLength, SEEK_CUR);
+	struct CentralDirectoryFileHeader next_cdfh;
+	zip_safe_fread(&next_cdfh, sizeof(struct CentralDirectoryFileHeader), 1, archive);
+	zip_bo_le_cfh(&next_cdfh);
+	if (next_cdfh.signature != 0x02014b50) return 1;
+
+	*next_cdfh_offset = cur_cdfh_offset +
+						sizeof(struct CentralDirectoryFileHeader) +
+						cur_cdfh.filenameLength +
+						cur_cdfh.extraFieldLength +
+						cur_cdfh.fileCommentLength;
+	return 0;
+}
+
 uint32_t zip_pack(
 		char* path_to_pack, char* archive_name,
 		uint32_t (*compress_fnc)(FILEOS* file_in, FILEOS* file_out), uint16_t compress_method,
