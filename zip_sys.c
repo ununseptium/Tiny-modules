@@ -1144,7 +1144,7 @@ uint32_t zip_sys_get_cdfh_offset(FILEOS* archive, uintmax_t* offset){
 	zip_bo_le_eocd(&eocd);
 
 	if (eocd.centralDirectoryOffset != UINT32_MAX){
-		*offset = eocd.totalCentralDirectoryRecord;
+		*offset = eocd.centralDirectoryOffset;
 		return 0;
 	}
 
