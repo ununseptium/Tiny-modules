@@ -429,18 +429,36 @@ uint32_t zip_unpack(char* path_to_archive, char* path_to_unpack){
 
 	FILEOS* archive = zip_safe_fopen(path_to_archive, "rb");
 	uintmax_t files_count;
-	if (zip_get_files_count(archive, &files_count) != 0) return 1;
+	zip_safe_get_cdfh_count(archive, &files_count);
 
-	zip_fpos_t central_directory_pos;
-	if (zip_get_central_directory_start(archive, &central_directory_pos) != 0) return 1;
+	uintmax_t cur_cdfh_offset;
+	zip_safe_get_cdfh_offset(archive, &cur_cdfh_offset);
 
 	zip_fpos_t local_directory_pos;
 	for (uintmax_t file_index = 0; file_index < files_count; file_index++){
-		FILEOS* cur_file = zip_create_file(path_to_unpack, &central_directory_pos, &local_directory_pos);
-		if (cur_file == NULL) return 1;
+		char* relative_filename = zip_get_filename_from_cdhf(archive, cur_cdfh_offset);
+		char absolute_filename[strlen(path_to_unpack) + strlen(relative_filename) + 1];
+		strcpy(absolute_filename, path_to_unpack);
+		strcat(absolute_filename, relative_filename);
+		zip_safe_free(relative_filename);
 
-		if (zip_write_file(cur_file, local_directory_pos) != 0) return 1;
-		zip_safe_fclose(cur_file);
+		uint32_t return_result = zip_safe_write_file(archive, cur_cdfh_offset, absolute_filename);
+		switch (return_result){
+			case 2:
+				printf("Warning: file %s already exists\n", absolute_filename);
+				break;
+			case 3:
+				printf("Warning: current archiver doesn\'t support compresion and encryption\n");
+				break;
+			case 4:
+				printf("Warning: file %s is corrupt\n", absolute_filename);
+				break;
+			default:
+				zip_sys_set_metadata(archive, cur_cdfh_offset, absolute_filename);
+				break;
+		}
+
+		zip_find_next_cdfh(archive, cur_cdfh_offset, &cur_cdfh_offset);
 	}
 
 	return 0;
