@@ -339,6 +339,20 @@ uint32_t write_EOCD(FILEOS* zipf, uintmax_t cdfh_offset, uintmax_t cdfh_total, u
 	return 0;
 }
 
+char* zip_get_filename_from_cdhf(FILEOS* archive, uintmax_t cdfh_offset){
+	if (archive == NULL) return NULL;
+
+	zip_safe_fseek(archive, cdfh_offset, SEEK_SET);
+	struct CentralDirectoryFileHeader cdfh;
+	zip_safe_fread(&cdfh, sizeof(struct CentralDirectoryFileHeader), 1, archive);
+	zip_bo_le_cfh(&cdfh);
+	if (cdfh.signature != 0x02014b50) return NULL;
+
+	char* filename = zip_safe_malloc(cdfh.filenameLength);
+	zip_safe_fread(filename, cdfh.filenameLength, 1, archive);
+	return filename;
+}
+
 uint32_t zip_pack(
 		char* path_to_pack, char* archive_name,
 		uint32_t (*compress_fnc)(FILEOS* file_in, FILEOS* file_out), uint16_t compress_method,

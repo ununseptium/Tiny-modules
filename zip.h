@@ -109,6 +109,8 @@ uint32_t write_CDFH(FILEOS *zipf, uintmax_t corresponding_lfh_offset, fileinfo_t
 
 uint32_t write_EOCD(FILEOS* zipf, uintmax_t cdfh_offset, uintmax_t cdfh_total, uintmax_t cdfh_size, char* comment);
 
+char* zip_get_filename_from_cdhf(FILEOS* archive, uintmax_t cdfh_offset);
+
 uint32_t zip_pack(
 		char* path_to_pack, char* archive_name,
 		uint32_t (*compress_fnc)(FILEOS* file_in, FILEOS* file_out), uint16_t compress_method,
