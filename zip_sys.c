@@ -1341,32 +1341,32 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 			return 0;
 		} else{
 			uint16_t block_tag;
-			memcpy(block_pos, &block_tag, sizeof(uint16_t));
+			memcpy(&block_tag, block_pos, sizeof(uint16_t));
 			zip_bo_le_uint16(&block_tag);
 			assert(block_tag == 0xa);
 
 			uint16_t block_size;
-			memcpy(block_pos + 2, &block_size, sizeof(uint16_t));
+			memcpy(&block_size, block_pos + 2, sizeof(uint16_t));
 			zip_bo_le_uint16(&block_size);
-			assert(block_size == NTFS_SIZE);
+			assert(block_size == NTFS_SIZE - sizeof(block_tag) - sizeof(block_size));
 
 			uint16_t ntfs_tag;
-			memcpy(block_pos + 8, &ntfs_tag, sizeof(uint16_t));
+			memcpy(&ntfs_tag, block_pos + 8, sizeof(uint16_t));
 			zip_bo_le_uint16(&ntfs_tag);
 			assert(ntfs_tag == 1);
 
 			uint16_t ntfs_size;
-			memcpy(block_pos + 10, &ntfs_size, sizeof(uint16_t));
+			memcpy(&ntfs_size, block_pos + 10, sizeof(uint16_t));
 			zip_bo_le_uint16(&ntfs_size);
 			assert(ntfs_size == sizeof(FILETIME) * 3);
 
 			FILETIME mtime;
-			memcpy(block_pos + 12, &mtime, sizeof(FILETIME));
+			memcpy(&mtime, block_pos + 12, sizeof(FILETIME));
 			zip_bo_le_uint32((uint32_t*)&(mtime.dwLowDateTime));
 			zip_bo_le_uint32((uint32_t*)&(mtime.dwHighDateTime));
 
 			FILETIME atime;
-			memcpy(block_pos + 20, &atime, sizeof(FILETIME));
+			memcpy(&atime, block_pos + 20, sizeof(FILETIME));
 			zip_bo_le_uint32((uint32_t*)&(atime.dwLowDateTime));
 			zip_bo_le_uint32((uint32_t*)&(atime.dwHighDateTime));
 
