@@ -438,8 +438,10 @@ uint32_t zip_unpack(char* path_to_archive, char* path_to_unpack){
 	zip_fpos_t local_directory_pos;
 	for (uintmax_t file_index = 0; file_index < files_count; file_index++){
 		char* relative_filename = zip_get_filename_from_cdhf(archive, cur_cdfh_offset);
-		char absolute_filename[strlen(path_to_unpack) + strlen(relative_filename) + 1];
+		if (relative_filename == NULL) return 1;
+		char absolute_filename[strlen(path_to_unpack) + strlen(relative_filename) + 2];
 		strcpy(absolute_filename, path_to_unpack);
+		strcat(absolute_filename, "/");
 		strcat(absolute_filename, relative_filename);
 		zip_safe_free(relative_filename);
 
