@@ -1207,7 +1207,7 @@ uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* 
 	if (cdfh.signature != 0x02014b50) return 1;
 
 	if (cdfh.uncompressedSize == 0){
-		FILEOS* file = (file_path, "w");
+		FILEOS* file = zip_sys_fopen(file_path, "w");
 		if (file == NULL) return 1;
 		zip_sys_fclose(file);
 		return 0;
