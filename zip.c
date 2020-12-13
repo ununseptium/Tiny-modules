@@ -348,7 +348,8 @@ char* zip_get_filename_from_cdhf(FILEOS* archive, uintmax_t cdfh_offset){
 	zip_bo_le_cfh(&cdfh);
 	if (cdfh.signature != 0x02014b50) return NULL;
 
-	char* filename = zip_safe_malloc(cdfh.filenameLength);
+	char* filename = zip_safe_malloc(cdfh.filenameLength + 1);
+	filename[cdfh.filenameLength] = 0;
 	zip_safe_fread(filename, cdfh.filenameLength, 1, archive);
 	return filename;
 }
