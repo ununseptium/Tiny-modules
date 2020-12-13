@@ -1259,7 +1259,7 @@ uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* 
 
 	uintmax_t archive_data_offset = lfh_offset + lfh.filenameLength + lfh.extraFieldLength;
 
-	FILEOS* file = zip_sys_fopen(file_path, "wb");
+	FILEOS* file = zip_sys_fopen(file_path, "wb+");
 	if (file == NULL) return 1;
 
 	uint32_t crc32_result;
