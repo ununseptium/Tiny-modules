@@ -1221,8 +1221,7 @@ uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* 
 	if (cdfh.localFileHeaderOffset != UINT32_MAX && cdfh.compressedSize){
 		lfh_offset = cdfh.localFileHeaderOffset;
 		compressed_size = cdfh.compressedSize;
-	}
-	else{
+	} else{
 		struct zip64_extra_field zip64_field;
 		if (cdfh.localFileHeaderOffset == UINT32_MAX)
 			zip64_field.correspondingHeaderOffset = &lfh_offset;
@@ -1257,7 +1256,10 @@ uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* 
 	zip_bo_le_lfh(&lfh);
 	if (lfh.signature != 0x04034b50) return 1;
 
-	uintmax_t archive_data_offset = lfh_offset + lfh.filenameLength + lfh.extraFieldLength;
+	uintmax_t archive_data_offset = lfh_offset +
+									sizeof(struct LocalFileHeader) +
+									lfh.filenameLength +
+									lfh.extraFieldLength;
 
 	FILEOS* file = zip_sys_fopen(file_path, "wb+");
 	if (file == NULL) return 1;
@@ -1308,7 +1310,8 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 	if (archive == NULL || file_path == NULL) return 1;
 	if (zip_sys_fseek(archive, cdfh_offset, SEEK_SET) != 0) return 1;
 	struct CentralDirectoryFileHeader cdfh;
-	if (zip_sys_fread(&cdfh, sizeof(struct CentralDirectoryFileHeader), 1, archive) != 1) return 1;
+	if (zip_sys_fread(&cdfh, sizeof(struct CentralDirectoryFileHeader), 1, archive) != 1)
+		return 1;
 	zip_bo_le_cfh(&cdfh);
 	if (cdfh.signature != 0x02014b50) return 1;
 
@@ -1330,18 +1333,19 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 		
 		if (SetFileAttributesA(filename, attributes) == 0) return 1;
 
-		void* win_extra_data = NULL;
+		void* cdfh_extra_data = NULL;
 		if (cdfh.extraFieldLength != 0){
-			win_extra_data = malloc(cdfh.extraFieldLength);
-			if (win_extra_data == NULL) return 1;
+			cdfh_extra_data = malloc(cdfh.extraFieldLength);
+			if (cdfh_extra_data == NULL) return 1;
 			if (zip_sys_fseek(archive, cdfh.filenameLength, SEEK_CUR) != 0) return 1;
-			if (zip_sys_fread(win_extra_data, cdfh.extraFieldLength, 1, archive) != 1) return 1;
+			if (zip_sys_fread(cdfh_extra_data, cdfh.extraFieldLength, 1, archive) != 1) return 1;
 		}
 
-		uint8_t* block_pos = zip_sys_find_tag_pos(win_extra_data, cdfh.extraFieldLength, 0xa);
+		uint8_t* block_pos = zip_sys_find_tag_pos(cdfh_extra_data, cdfh.extraFieldLength, 0xa);
 		if (block_pos == NULL){
 			FILETIME filetime;
-			if (DosDateTimeToFileTime(cdfh.modificationDate, cdfh.modificationTime, &filetime) == 0) return 1;
+			if (DosDateTimeToFileTime(cdfh.modificationDate, cdfh.modificationTime, &filetime) == 0)
+				return 1;
 
 			FILEOS* file;
 			if (is_dir)   
