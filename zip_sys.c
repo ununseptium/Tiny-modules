@@ -1182,16 +1182,22 @@ uint32_t zip_sys_get_cdfh_offset(FILEOS* archive, uintmax_t* offset){
 
 uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* file_path){
 	if (archive == NULL || file_path == NULL) return 1;
+
+	if (file_path[strlen(file_path) - 1] == '/'){
+		char dirname[strlen(file_path)];
+		strncpy(dirname, file_path, strlen(file_path) - 1);
+
+		uint32_t file_exists = zip_sys_is_file_exist(dirname);
+		if (file_exists == UINT32_MAX) return 1;
+		if (file_exists) return 2;
+
+		if (zip_sys_create_dir(dirname) != UINT32_MAX) return 1;
+		return 0;
+	}
+
 	uint32_t file_exists = zip_sys_is_file_exist(file_path);
 	if (file_exists == UINT32_MAX) return 1;
 	if (file_exists) return 2;
-
-	if (file_path[strlen(file_path) - 1] == '/'){
-		char dir_filename[strlen(file_path)];
-		strncpy(dir_filename, file_path, strlen(file_path) - 1);
-		if (zip_sys_create_dir(dir_filename) != UINT32_MAX) return 1;
-		return 0;
-	}
 
 	if (zip_sys_fseek(archive, cdfh_offset, SEEK_SET) != 0) return 1;
 	struct CentralDirectoryFileHeader cdfh;
