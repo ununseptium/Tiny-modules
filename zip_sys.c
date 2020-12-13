@@ -1273,8 +1273,9 @@ uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* 
 		return 1;
 	}
 
+	zip_sys_fclose(file);
+
 	if (lfh.crc32 != crc32_result){
-		zip_sys_fclose(file);
 		remove(file_path);
 		return 4;
 	}
