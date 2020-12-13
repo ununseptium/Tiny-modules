@@ -1265,7 +1265,7 @@ uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* 
 	uint32_t crc32_result;
 	if (
 				zip_sys_f2f_data_transfer(
-						archive, archive_data_offset, file, 0, compressed_size, &crc32_result
+						file, 0, archive, archive_data_offset, compressed_size, &crc32_result
 				) != 0
 	){
 		zip_sys_fclose(file);
