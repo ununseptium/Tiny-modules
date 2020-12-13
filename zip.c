@@ -461,7 +461,8 @@ uint32_t zip_unpack(char* path_to_archive, char* path_to_unpack){
 				break;
 		}
 
-		zip_find_next_cdfh(archive, cur_cdfh_offset, &cur_cdfh_offset);
+		uint32_t file_is_last = file_index == files_count - 1;
+		if (!file_is_last && zip_find_next_cdfh(archive, cur_cdfh_offset, &cur_cdfh_offset) != 0) return 1;
 	}
 
 	return 0;
