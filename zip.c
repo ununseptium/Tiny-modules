@@ -435,7 +435,6 @@ uint32_t zip_unpack(char* path_to_archive, char* path_to_unpack){
 	uintmax_t cur_cdfh_offset;
 	zip_safe_get_cdfh_offset(archive, &cur_cdfh_offset);
 
-	zip_fpos_t local_directory_pos;
 	for (uintmax_t file_index = 0; file_index < files_count; file_index++){
 		char* relative_filename = zip_get_filename_from_cdhf(archive, cur_cdfh_offset);
 		if (relative_filename == NULL) return 1;
