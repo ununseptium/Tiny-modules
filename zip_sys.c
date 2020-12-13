@@ -1324,9 +1324,9 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 		uint16_t win_mask_attrs = 1 + 2 + 4 + 16 + 32;
 		uint32_t attributes;
 		if (cdfh.versionMadeBy == WINDOWS_OS_VER)
-			attributes = cdfh.internalFileAttributes;
+			attributes = cdfh.externalFileAttributes;
 		else
-			attributes = cdfh.internalFileAttributes & win_mask_attrs;
+			attributes = cdfh.externalFileAttributes & win_mask_attrs;
 		
 		if (SetFileAttributesA(filename, attributes) == 0) return 1;
 
