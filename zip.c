@@ -424,7 +424,7 @@ uint32_t zip_unpack(char* path_to_archive, char* path_to_unpack){
 	uint32_t archive_is_exist = zip_safe_is_file_exist(path_to_archive) && !zip_safe_is_folder(path_to_archive);
 	if (!archive_is_exist) return 1;
 
-	uint32_t unpack_path_is_exist = zip_safe_is_file_exist(path_to_archive) && zip_safe_is_folder(path_to_archive);
+	uint32_t unpack_path_is_exist = zip_safe_is_file_exist(path_to_unpack) && zip_safe_is_folder(path_to_unpack);
 	if (!unpack_path_is_exist) return 1;
 
 	FILEOS* archive = zip_safe_fopen(path_to_archive, "rb");
