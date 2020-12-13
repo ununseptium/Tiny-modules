@@ -1339,7 +1339,7 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 		}
 
 		uint8_t* block_pos = zip_sys_find_tag_pos(win_extra_data, cdfh.extraFieldLength, 0xa);
-		if (cdfh.versionMadeBy != WINDOWS_OS_VER || block_pos == NULL){
+		if (block_pos == NULL){
 			FILETIME filetime;
 			if (DosDateTimeToFileTime(cdfh.modificationDate, cdfh.modificationTime, &filetime) == 0) return 1;
 
