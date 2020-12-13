@@ -1081,9 +1081,9 @@ uint32_t zip_sys_get_cdfh_count(FILEOS* archive, uintmax_t* count){
 	do{
 		if (zip_sys_fread(&signature, sizeof(uint32_t), 1, archive) != 1) return 1;
 		zip_bo_le_uint32(&signature);
-		if (zip_sys_fseek(archive, -sizeof(uint32_t) * 2, SEEK_CUR) != 0) return 1;
+		if (zip_sys_fseek(archive, -sizeof(uint32_t) - 1, SEEK_CUR) != 0) return 1;
 	}while(signature != 0x06054b50);
-	if (zip_sys_fseek(archive, -sizeof(uint32_t), SEEK_CUR) != 0) return 1;
+	if (zip_sys_fseek(archive, 1, SEEK_CUR) != 0) return 1;
 
 	struct EOCD eocd;
 	if (zip_sys_fread(&eocd, sizeof(struct EOCD), 1, archive) != 1) return 1;
