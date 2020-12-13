@@ -1285,11 +1285,11 @@ static uint8_t* zip_sys_find_tag_pos(const void* extra_data, uint16_t extra_data
 	while (1){
 		if (offset >= extra_data_size) return NULL;
 
-		cur_tag = ((uint8_t*)extra_data)[offset];
+		cur_tag = ((uint16_t*)extra_data)[offset];
 		zip_bo_le_uint16(&cur_tag);
 		if (cur_tag == tag) break;
 
-		cur_block_size = ((uint8_t*)extra_data)[offset + sizeof(uint16_t)];
+		cur_block_size = ((uint16_t*)extra_data)[offset + sizeof(uint16_t)];
 		zip_bo_le_uint16(&cur_block_size);
 		offset += sizeof(uint16_t) + sizeof(uint16_t) + cur_block_size;
 	}
