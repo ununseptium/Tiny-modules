@@ -1312,6 +1312,13 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 	if (cdfh.signature != 0x02014b50) return 1;
 
 	#ifdef __WIN32__
+		uint32_t is_dir = file_path[strlen(file_path) - 1] == '/';
+		char filename[strlen(file_path) + 1];
+		strcpy(filename, file_path);
+		if (is_dir){
+			filename[strlen(file_path) - 1] == 0;
+		}
+
 		// representation of 0b00110111
 		uint16_t win_mask_attrs = 1 + 2 + 4 + 16 + 32;
 		uint32_t attributes;
@@ -1320,7 +1327,7 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 		else
 			attributes = cdfh.internalFileAttributes & win_mask_attrs;
 		
-		if (SetFileAttributesA(file_path, attributes) == 0) return 1;
+		if (SetFileAttributesA(filename, attributes) == 0) return 1;
 
 		void* win_extra_data = NULL;
 		if (cdfh.extraFieldLength != 0){
@@ -1335,7 +1342,14 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 			FILETIME filetime;
 			if (DosDateTimeToFileTime(cdfh.modificationDate, cdfh.modificationTime, &filetime) == 0) return 1;
 
-			FILEOS* file = zip_sys_fopen(file_path, "r");
+			FILEOS* file;
+			if (is_dir)   
+				file = CreateFileA(
+						filename, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS,
+						FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL
+				);
+			else
+				file = zip_sys_fopen(filename, "a+");
 			if (file == NULL) return 1;
 
 			if (SetFileTime(file, NULL, NULL, &filetime) == 0){
@@ -1381,8 +1395,16 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 			zip_bo_le_uint32((uint32_t*)&(atime.dwLowDateTime));
 			zip_bo_le_uint32((uint32_t*)&(atime.dwHighDateTime));
 
-			FILEOS* file = zip_sys_fopen(file_path, "r");
+			FILEOS* file;
+			if (is_dir)   
+				file = CreateFileA(
+						filename, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, 
+						FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL
+				);
+			else
+				file = zip_sys_fopen(filename, "a+");
 			if (file == NULL) return 1;
+
 			if (SetFileTime(file, &ctime, &atime, &mtime) == 0){
 				zip_sys_fclose(file);
 				return 1;
