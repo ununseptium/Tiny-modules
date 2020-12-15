@@ -354,11 +354,20 @@ void zip_safe_get_cdfh_offset(FILEOS* archive, uintmax_t* offset){
 }
 
 uint32_t zip_safe_write_file(FILEOS* archive, uintmax_t cdfh_offset, char* file_path){
+	zip_safe_add_file_to_delete(file_path);
 	uint32_t res = zip_sys_write_file(archive, cdfh_offset, file_path);
 	if (res == 1){
 		zip_safe_collect_garbage();
 		abort();
 	}
+
+	for (int i = 0; i < MAX_STREAMS; i++){
+		if (garbage_files[i] != NULL && !strcpy(garbage_files[i], file_path)){
+			free(garbage_files[i]);
+			garbage_files[i] = NULL;
+		}
+	}
+
 	return res;
 }
 
