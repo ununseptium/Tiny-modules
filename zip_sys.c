@@ -1186,6 +1186,7 @@ uint32_t zip_sys_write_file(FILEOS* archive, uintmax_t cdfh_offset, const char* 
 	if (file_path[strlen(file_path) - 1] == '/'){
 		char dirname[strlen(file_path)];
 		strncpy(dirname, file_path, strlen(file_path) - 1);
+		dirname[strlen(file_path) - 1] = '\0';
 
 		uint32_t file_exists = zip_sys_is_file_exist(dirname);
 		if (file_exists == UINT32_MAX) return 1;
