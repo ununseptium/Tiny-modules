@@ -456,7 +456,7 @@ uint32_t zip_unpack(char* path_to_archive, char* path_to_unpack){
 				printf("Warning: file %s is corrupt\n", absolute_filename);
 				break;
 			default:
-				zip_sys_safe_metadata(archive, cur_cdfh_offset, absolute_filename);
+				zip_safe_set_metadata(archive, cur_cdfh_offset, absolute_filename);
 				break;
 		}
 
