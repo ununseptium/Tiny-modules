@@ -1324,16 +1324,7 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 			filename[strlen(file_path) - 1] == 0;
 		}
 
-		// representation of 0b00110111
-		uint16_t win_mask_attrs = 1 + 2 + 4 + 16 + 32;
-		uint32_t attributes;
-		if (cdfh.versionMadeBy == WINDOWS_OS_VER)
-			attributes = cdfh.externalFileAttributes;
-		else
-			attributes = cdfh.externalFileAttributes & win_mask_attrs;
 		
-		if (SetFileAttributesA(filename, attributes) == 0) return 1;
-
 		void* cdfh_extra_data = NULL;
 		if (cdfh.extraFieldLength != 0){
 			cdfh_extra_data = malloc(cdfh.extraFieldLength);
@@ -1364,7 +1355,6 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 			}
 
 			zip_sys_fclose(file);
-			return 0;
 		} else{
 			uint16_t block_tag;
 			memcpy(&block_tag, block_pos, sizeof(uint16_t));
@@ -1417,8 +1407,19 @@ uint32_t zip_sys_set_metadata(FILEOS* archive, zip_fpos_t cdfh_offset, const cha
 			}
 
 			zip_sys_fclose(file);
-			return 0;
 		}
+		
+		// representation of 0b00110111
+		uint16_t win_mask_attrs = 1 + 2 + 4 + 16 + 32;
+		uint32_t attributes;
+		if (cdfh.versionMadeBy == WINDOWS_OS_VER)
+			attributes = cdfh.externalFileAttributes;
+		else
+			attributes = cdfh.externalFileAttributes & win_mask_attrs;
+		
+		if (SetFileAttributesA(filename, attributes) == 0) return 1;
+
+		return 0;
 	#endif
 
 	return 1;
