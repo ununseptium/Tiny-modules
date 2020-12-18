@@ -32,7 +32,11 @@ static void zip_safe_collect_garbage(){
 	}
 
 	for (uint32_t path_index = 0; path_index < MAX_STREAMS; path_index++){
-		if (garbage_files[path_index] != NULL){
+		if (
+					garbage_files[path_index] != NULL && 
+					zip_safe_is_file_exist(garbage_files[path_index]) && 
+					!zip_safe_is_folder(garbage_files[path_index])
+		){
 			remove(garbage_files[path_index]);
 		}
 	}
